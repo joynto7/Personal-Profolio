@@ -5,8 +5,6 @@ import { experience } from "@/data/experience";
 import { TimelineItem } from "@/components/sections/timeline-item";
 
 export function Experience() {
-  if (experience.length === 0) return null;
-
   return (
     <section id="experience" className="scroll-mt-20 bg-background py-24">
       <div className="mx-auto max-w-3xl px-6">
@@ -25,20 +23,26 @@ export function Experience() {
           </h2>
         </motion.div>
 
-        <div className="mt-14">
-          {experience.map((entry, i) => (
-            <TimelineItem
-              key={entry.company}
-              index={i}
-              isLast={i === experience.length - 1}
-              title={entry.role}
-              subtitle={entry.company}
-              period={`${entry.startDate} — ${entry.endDate}`}
-              description={entry.description}
-              bullets={entry.highlights}
-            />
-          ))}
-        </div>
+        {experience.length === 0 ? (
+          <p className="mt-14 text-center text-muted-foreground">
+            Nothing to show here yet — check back soon.
+          </p>
+        ) : (
+          <div className="mt-14">
+            {experience.map((entry, i) => (
+              <TimelineItem
+                key={entry.company}
+                index={i}
+                isLast={i === experience.length - 1}
+                title={entry.role}
+                subtitle={entry.company}
+                period={`${entry.startDate} — ${entry.endDate}`}
+                description={entry.description}
+                bullets={entry.highlights}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
