@@ -11,7 +11,7 @@ export const profile = {
   whatsapp: "+880 1305 531529",
   bio: {
     journey:
-      "I started programming in my second year of college after building a small script to automate a repetitive spreadsheet task for a college club — seeing it save hours of manual work got me hooked. Since then I've gone from tutorials to shipping full-stack side projects, contributing to a couple of open-source repos, and interning as a frontend developer over one summer. I'm currently a software engineering student, spending most of my free time deepening my understanding of the web platform, system design basics, and clean architecture.",
+      "I started programming in my second year of college after building a small script to automate a repetitive spreadsheet task for a college club — seeing it save hours of manual work got me hooked. Since then I've been building full-stack side projects and steadily leveling up as a software engineering student, spending most of my free time deepening my understanding of the web platform, system design basics, and clean architecture.",
     enjoy:
       "I enjoy the moment a messy problem turns into a clean solution — refactoring a tangled component into something obvious, or shaving a slow API down to something snappy. I'm most at home working across the stack: wiring up a database schema in the morning and polishing a UI micro-interaction in the afternoon. I also like pairing with teammates and explaining tricky concepts, which is part of why I write short technical notes for myself as I learn.",
     hobbies:
