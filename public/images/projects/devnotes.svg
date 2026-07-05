@@ -1,0 +1,24 @@
+<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="500" fill="#F3EEE8" />
+  <defs>
+    <linearGradient id="g3" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6F4E37" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#D7B899" stop-opacity="0.35" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#g3)" />
+  <rect x="150" y="90" width="220" height="320" rx="14" fill="#FFFFFF" stroke="#E8DED5" stroke-width="2" />
+  <rect x="180" y="130" width="160" height="14" rx="6" fill="#4A2F27" />
+  <rect x="180" y="160" width="130" height="10" rx="5" fill="#C28A58" />
+  <rect x="180" y="184" width="150" height="8" rx="4" fill="#E8DED5" />
+  <rect x="180" y="202" width="140" height="8" rx="4" fill="#E8DED5" />
+  <rect x="180" y="220" width="120" height="8" rx="4" fill="#E8DED5" />
+  <rect x="180" y="248" width="90" height="8" rx="4" fill="#D7B899" />
+  <rect x="430" y="90" width="220" height="320" rx="14" fill="#4A2F27" />
+  <rect x="460" y="130" width="160" height="14" rx="6" fill="#FAF8F5" opacity="0.9" />
+  <rect x="460" y="160" width="130" height="10" rx="5" fill="#C28A58" />
+  <rect x="460" y="184" width="150" height="8" rx="4" fill="#FAF8F5" opacity="0.4" />
+  <rect x="460" y="202" width="140" height="8" rx="4" fill="#FAF8F5" opacity="0.4" />
+  <rect x="460" y="220" width="120" height="8" rx="4" fill="#FAF8F5" opacity="0.4" />
+  <path d="M390 250l30-20v40z" fill="#C28A58" />
+</svg>
