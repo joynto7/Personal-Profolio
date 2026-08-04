@@ -8,6 +8,7 @@ export const profile = {
   resumeUrl: "/CV.pdf",
   email: "joyntoghosh7@gmail.com",
   phone: "+880 1305 531529",
+  whatsapp: "+880 1305 531529",
   bio: {
     journey:
       "I started programming in my second year of college after building a small script to automate a repetitive spreadsheet task for a college club — seeing it save hours of manual work got me hooked. Since then I've been building full-stack side projects and steadily leveling up as a software engineering student, spending most of my free time deepening my understanding of the web platform, system design basics, and clean architecture.",
