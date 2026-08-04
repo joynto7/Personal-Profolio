@@ -5,7 +5,7 @@ export const profile = {
     "I build fast, accessible web apps and enjoy turning complex problems into simple, well-crafted interfaces.",
   location: "Dhaka, Bangladesh",
   avatarSrc: "/images/IMG_6159.jpeg",
-  resumeUrl: "/Users/joyntoghosh/Downloads/Joynto_Ghosh_CV.pdf",
+  resumeUrl: "/CV.pdf",
   email: "joyntoghosh7@gmail.com",
   phone: "+880 1305 531529",
   bio: {
