@@ -2,8 +2,7 @@
 
 Personal portfolio site — about me, skills, education, experience, and a contact form.
 
-**Live:** https://personal-portfolio-lilac-seven-29.vercel.app
-
+**Live:** https://joyntoghosh.vercel.app/
 ## Tech Stack
 
 - Next.js 16 (App Router, Turbopack)
