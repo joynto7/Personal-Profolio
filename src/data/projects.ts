@@ -14,39 +14,31 @@ export type Project = {
 
 export const projects: Project[] = [
   {
-    slug: "food-delivery-webpage",
-    name: "Food Delivery Webpage",
-    tagline: "A food delivery web page built for Penguin, an independent club",
-    image: "/images/projects/foodhub.svg",
-    description:
-      "A food delivery web page built while working with Penguin, an independent club that runs projects across different fields.",
+    slug: "agrosync",
+    name: "AgroSync",
+    tagline:
+      "A real-time smart irrigation dashboard for a physical ESP32-based agriculture rig",
+    image: "/images/projects/AgroSync.png",
+    techStack: ["Next.js", "Express", "Prisma", "PostgreSQL", "MQTT"],
+    caseStudySlug: "agrosync",
   },
   {
     slug: "club-connect",
     name: "Club Connect",
     tagline:
       "A full-stack platform for managing university clubs, events, and student engagement",
-    image: "/images/projects/taskflow.svg",
+    image: "/images/projects/ClubConnect.png",
     techStack: ["Next.js", "Express", "TypeScript", "Prisma", "PostgreSQL"],
     caseStudySlug: "club-connect",
   },
   {
-    slug: "guitar-selling-webpage",
-    name: "Guitar Selling Webpage",
-    tagline: "A marketplace web page for buying and selling guitars",
-    image: "/images/projects/devnotes.svg",
-    description:
-      "A marketplace-style web page for buying and selling guitars, built for Penguin club.",
-  },
-  {
-    slug: "agrosync",
-    name: "Agrosync",
-    image: "/images/projects/foodhub.svg",
-  },
-  {
     slug: "fixitnow",
-    name: "Fixitnow",
-    image: "/images/projects/taskflow.svg",
+    name: "FixItNow",
+    tagline:
+      "A home services marketplace connecting customers with technicians for real-time booking and payment",
+    image: "/images/projects/FixItNow.png",
+    techStack: ["Next.js", "React", "TypeScript", "Tailwind CSS"],
+    caseStudySlug: "fixitnow",
   },
 ];
 

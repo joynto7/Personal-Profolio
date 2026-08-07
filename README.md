@@ -24,8 +24,8 @@ Everything on the site is content-driven from a handful of typed data files unde
 | **Skills** | Frontend, backend, and tooling I work with, grouped by category |
 | **Education** | Academic background |
 | **Experience** | Work history |
-| **Projects** | Cards for each project, linking to either a lightweight detail page or a full case study |
-| **Case Study** | A deep engineering write-up for [Club Connect](https://joyntoghosh.vercel.app/case-studies/club-connect) — architecture, system design, security, and real technical challenges, not just a screenshot |
+| **Projects** | Cards for [AgroSync](https://joyntoghosh.vercel.app/case-studies/agrosync), [Club Connect](https://joyntoghosh.vercel.app/case-studies/club-connect), and [FixItNow](https://joyntoghosh.vercel.app/case-studies/fixitnow) |
+| **Case Studies** | A deep engineering write-up for each project — architecture, system design, security, and real technical challenges, not just a screenshot |
 | **Contact** | A working contact form (via Resend) plus direct email/social links |
 
 ## Tech Stack
