@@ -8,6 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import type { Project } from "@/data/projects";
 
 export function ProjectCard({ project, index }: { project: Project; index: number }) {
+  const href = project.caseStudySlug
+    ? `/case-studies/${project.caseStudySlug}`
+    : `/projects/${project.slug}`;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -24,26 +28,35 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
           sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
+        {project.caseStudySlug && (
+          <span className="absolute left-3 top-3 rounded-full bg-primary px-2.5 py-1 text-xs font-semibold text-primary-foreground shadow-sm">
+            Case Study
+          </span>
+        )}
       </div>
 
       <div className="flex flex-1 flex-col p-6">
         <h3 className="font-heading text-xl font-medium text-foreground">
           {project.name}
         </h3>
-        <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">
-          {project.tagline}
-        </p>
+        {project.tagline && (
+          <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">
+            {project.tagline}
+          </p>
+        )}
 
-        <div className="mt-4 flex flex-wrap gap-1.5">
-          {project.techStack.slice(0, 4).map((tech) => (
-            <Badge key={tech} variant="secondary">
-              {tech}
-            </Badge>
-          ))}
-        </div>
+        {project.techStack && project.techStack.length > 0 && (
+          <div className="mt-4 flex flex-wrap gap-1.5">
+            {project.techStack.slice(0, 4).map((tech) => (
+              <Badge key={tech} variant="secondary">
+                {tech}
+              </Badge>
+            ))}
+          </div>
+        )}
 
         <Link
-          href={`/projects/${project.slug}`}
+          href={href}
           className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-foreground transition-colors hover:text-caramel"
         >
           View Details
