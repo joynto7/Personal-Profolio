@@ -1,9 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { skills, type Skill } from "@/data/skills";
+import type { Prisma, Skill } from "@prisma/client";
+import { ICONS } from "@/lib/icons";
+
+export type SkillGroupWithSkills = Prisma.SkillGroupGetPayload<{
+  include: { skills: true };
+}>;
 
 function SkillChip({ skill, delay }: { skill: Skill; delay: number }) {
+  const Icon = ICONS[skill.iconKey];
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -12,16 +19,18 @@ function SkillChip({ skill, delay }: { skill: Skill; delay: number }) {
       transition={{ duration: 0.4, delay }}
       className="flex flex-col items-center gap-3 rounded-xl border border-border bg-background px-4 py-5 text-center transition-colors hover:border-caramel"
     >
-      <skill.icon
-        className={`size-7 shrink-0 ${skill.monochrome ? "text-foreground" : ""}`}
-        style={skill.monochrome ? undefined : { color: skill.color }}
-      />
+      {Icon && (
+        <Icon
+          className={`size-7 shrink-0 ${skill.monochrome ? "text-foreground" : ""}`}
+          style={skill.monochrome ? undefined : { color: skill.color }}
+        />
+      )}
       <span className="text-sm font-medium text-foreground">{skill.name}</span>
     </motion.div>
   );
 }
 
-export function Skills() {
+export function Skills({ skillGroups }: { skillGroups: SkillGroupWithSkills[] }) {
   return (
     <section id="skills" className="scroll-mt-20 bg-background py-24">
       <div className="mx-auto max-w-6xl px-6">
@@ -45,14 +54,14 @@ export function Skills() {
         </motion.div>
 
         <div className="mt-14 flex flex-col gap-10">
-          {skills.map((group) => (
-            <div key={group.category}>
+          {skillGroups.map((group) => (
+            <div key={group.id}>
               <h3 className="font-heading text-xl font-medium text-foreground">
                 {group.category}
               </h3>
               <div className="mt-5 grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-6">
                 {group.skills.map((skill, i) => (
-                  <SkillChip key={skill.name} skill={skill} delay={i * 0.04} />
+                  <SkillChip key={skill.id} skill={skill} delay={i * 0.04} />
                 ))}
               </div>
             </div>
