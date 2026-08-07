@@ -1,10 +1,13 @@
 import { ImageResponse } from "next/og";
-import { profile } from "@/data/profile";
+import { getProfile } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default async function OpengraphImage() {
+  const profile = await getProfile();
+
   return new ImageResponse(
     (
       <div
