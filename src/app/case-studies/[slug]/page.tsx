@@ -14,19 +14,20 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { caseStudies, getCaseStudyBySlug } from "@/data/case-studies";
+import { getCaseStudyBySlug } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
 
 type Props = {
   params: Promise<{ slug: string }>;
 };
 
-export function generateStaticParams() {
-  return caseStudies.map((caseStudy) => ({ slug: caseStudy.slug }));
-}
+type Screenshot = { url: string; caption: string };
+type CodeSnippet = { title: string; language: string; code: string };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const caseStudy = getCaseStudyBySlug(slug);
+  const caseStudy = await getCaseStudyBySlug(slug);
   if (!caseStudy) return {};
   return {
     title: `${caseStudy.name} — Case Study`,
@@ -36,9 +37,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CaseStudyPage({ params }: Props) {
   const { slug } = await params;
-  const caseStudy = getCaseStudyBySlug(slug);
+  const caseStudy = await getCaseStudyBySlug(slug);
 
   if (!caseStudy) notFound();
+
+  const screenshots = caseStudy.screenshots as unknown as Screenshot[];
+  const codeSnippets = caseStudy.codeSnippets as unknown as CodeSnippet[];
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-16">
@@ -52,7 +56,7 @@ export default async function CaseStudyPage({ params }: Props) {
 
       <div className="relative mt-6 aspect-video overflow-hidden rounded-2xl border border-border shadow-sm">
         <Image
-          src={caseStudy.image}
+          src={caseStudy.imageUrl}
           alt={caseStudy.name}
           fill
           sizes="(min-width: 1024px) 56rem, 100vw"
@@ -187,7 +191,7 @@ export default async function CaseStudyPage({ params }: Props) {
         </section>
       </div>
 
-      {caseStudy.lessonsLearned && caseStudy.lessonsLearned.length > 0 && (
+      {caseStudy.lessonsLearned.length > 0 && (
         <section className="mt-12">
           <h2 className="font-heading text-xl font-medium text-foreground">Lessons Learned</h2>
           <ul className="mt-4 flex flex-col gap-3">
@@ -204,15 +208,15 @@ export default async function CaseStudyPage({ params }: Props) {
         </section>
       )}
 
-      {caseStudy.screenshots && caseStudy.screenshots.length > 0 && (
+      {screenshots.length > 0 && (
         <section className="mt-12">
           <h2 className="font-heading text-xl font-medium text-foreground">Screenshots</h2>
           <div className="mt-4 grid gap-6 sm:grid-cols-2">
-            {caseStudy.screenshots.map((shot) => (
-              <figure key={shot.src}>
+            {screenshots.map((shot) => (
+              <figure key={shot.url}>
                 <div className="relative aspect-video overflow-hidden rounded-xl border border-border">
                   <Image
-                    src={shot.src}
+                    src={shot.url}
                     alt={shot.caption}
                     fill
                     sizes="(min-width: 640px) 28rem, 100vw"
@@ -228,11 +232,11 @@ export default async function CaseStudyPage({ params }: Props) {
         </section>
       )}
 
-      {caseStudy.codeSnippets && caseStudy.codeSnippets.length > 0 && (
+      {codeSnippets.length > 0 && (
         <section className="mt-12">
           <h2 className="font-heading text-xl font-medium text-foreground">Code Snippets</h2>
           <div className="mt-4 flex flex-col gap-6">
-            {caseStudy.codeSnippets.map((snippet) => (
+            {codeSnippets.map((snippet) => (
               <div key={snippet.title}>
                 <p className="mb-2 text-sm font-medium text-foreground">
                   {snippet.title}{" "}

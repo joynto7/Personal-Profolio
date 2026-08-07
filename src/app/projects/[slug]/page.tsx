@@ -6,19 +6,17 @@ import { ArrowLeft, ExternalLink, Lightbulb, Puzzle } from "lucide-react";
 import { FaGithub } from "react-icons/fa6";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { projects, getProjectBySlug } from "@/data/projects";
+import { getProjectBySlug } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
 
 type Props = {
   params: Promise<{ slug: string }>;
 };
 
-export function generateStaticParams() {
-  return projects.map((project) => ({ slug: project.slug }));
-}
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const project = getProjectBySlug(slug);
+  const project = await getProjectBySlug(slug);
   if (!project) return {};
   return {
     title: project.name,
@@ -28,7 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProjectPage({ params }: Props) {
   const { slug } = await params;
-  const project = getProjectBySlug(slug);
+  const project = await getProjectBySlug(slug);
 
   if (!project) notFound();
   if (project.caseStudySlug) permanentRedirect(`/case-studies/${project.caseStudySlug}`);
@@ -45,7 +43,7 @@ export default async function ProjectPage({ params }: Props) {
 
       <div className="relative mt-6 aspect-video overflow-hidden rounded-2xl border border-border shadow-sm">
         <Image
-          src={project.image}
+          src={project.imageUrl}
           alt={project.name}
           fill
           sizes="(min-width: 1024px) 56rem, 100vw"
@@ -61,7 +59,7 @@ export default async function ProjectPage({ params }: Props) {
         <p className="mt-2 text-lg text-muted-foreground">{project.tagline}</p>
       )}
 
-      {project.techStack && project.techStack.length > 0 && (
+      {project.techStack.length > 0 && (
         <div className="mt-5 flex flex-wrap gap-2">
           {project.techStack.map((tech) => (
             <Badge key={tech} variant="secondary">
@@ -103,10 +101,9 @@ export default async function ProjectPage({ params }: Props) {
         </section>
       )}
 
-      {((project.challenges?.length ?? 0) > 0 ||
-        (project.futureImprovements?.length ?? 0) > 0) && (
+      {(project.challenges.length > 0 || project.futureImprovements.length > 0) && (
         <div className="mt-12 grid gap-8 md:grid-cols-2">
-          {project.challenges && project.challenges.length > 0 && (
+          {project.challenges.length > 0 && (
             <section>
               <div className="flex items-center gap-2">
                 <Puzzle className="size-5 text-primary" />
@@ -128,7 +125,7 @@ export default async function ProjectPage({ params }: Props) {
             </section>
           )}
 
-          {project.futureImprovements && project.futureImprovements.length > 0 && (
+          {project.futureImprovements.length > 0 && (
             <section>
               <div className="flex items-center gap-2">
                 <Lightbulb className="size-5 text-primary" />
