@@ -2,27 +2,27 @@
 
 import { motion } from "framer-motion";
 import { Compass, Heart, Coffee } from "lucide-react";
-import { profile } from "@/data/profile";
+import type { Profile } from "@prisma/client";
 
-const blocks = [
-  {
-    icon: Compass,
-    title: "My Journey",
-    text: profile.bio.journey,
-  },
-  {
-    icon: Heart,
-    title: "What I Enjoy",
-    text: profile.bio.enjoy,
-  },
-  {
-    icon: Coffee,
-    title: "Outside of Code",
-    text: profile.bio.hobbies,
-  },
-];
+export function About({ profile }: { profile: Profile }) {
+  const blocks = [
+    {
+      icon: Compass,
+      title: "My Journey",
+      text: profile.bioJourney,
+    },
+    {
+      icon: Heart,
+      title: "What I Enjoy",
+      text: profile.bioEnjoy,
+    },
+    {
+      icon: Coffee,
+      title: "Outside of Code",
+      text: profile.bioHobbies,
+    },
+  ];
 
-export function About() {
   return (
     <section id="about" className="scroll-mt-20 bg-muted py-24">
       <div className="mx-auto max-w-6xl px-6">

@@ -6,18 +6,24 @@ import { Experience } from "@/components/sections/experience";
 import { Projects } from "@/components/sections/projects";
 import { CaseStudies } from "@/components/sections/case-studies";
 import { Contact } from "@/components/sections/contact";
+import { getProfile, prisma } from "@/lib/prisma";
 
-export default function Home() {
+export default async function Home() {
+  const [profile, socials] = await Promise.all([
+    getProfile(),
+    prisma.social.findMany({ orderBy: { order: "asc" } }),
+  ]);
+
   return (
     <main className="flex flex-1 flex-col">
-      <Hero />
-      <About />
+      <Hero profile={profile} socials={socials} />
+      <About profile={profile} />
       <Skills />
       <Education />
       <Experience />
       <Projects />
       <CaseStudies />
-      <Contact />
+      <Contact profile={profile} />
     </main>
   );
 }

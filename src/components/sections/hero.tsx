@@ -4,10 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Download } from "lucide-react";
+import type { Profile, Social } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { profile } from "@/data/profile";
-import { socials } from "@/data/socials";
+import { ICONS } from "@/lib/icons";
 
 const container = {
   hidden: {},
@@ -19,7 +19,7 @@ const item = {
   show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } },
 };
 
-export function Hero() {
+export function Hero({ profile, socials }: { profile: Profile; socials: Social[] }) {
   return (
     <section className="mx-auto flex max-w-6xl flex-col-reverse items-center gap-12 px-6 py-20 md:flex-row md:py-28">
       <motion.div
@@ -62,22 +62,25 @@ export function Hero() {
         </motion.div>
 
         <motion.div variants={item} className="mt-8 flex gap-3">
-          {socials.map((social) => (
-            <Tooltip key={social.label}>
-              <TooltipTrigger asChild>
-                <a
-                  href={social.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={social.label}
-                  className="flex size-10 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:border-caramel hover:bg-caramel hover:text-white"
-                >
-                  <social.icon className="size-4" />
-                </a>
-              </TooltipTrigger>
-              <TooltipContent>{social.label}</TooltipContent>
-            </Tooltip>
-          ))}
+          {socials.map((social) => {
+            const Icon = ICONS[social.iconKey];
+            return (
+              <Tooltip key={social.id}>
+                <TooltipTrigger asChild>
+                  <a
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={social.label}
+                    className="flex size-10 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:border-caramel hover:bg-caramel hover:text-white"
+                  >
+                    {Icon && <Icon className="size-4" />}
+                  </a>
+                </TooltipTrigger>
+                <TooltipContent>{social.label}</TooltipContent>
+              </Tooltip>
+            );
+          })}
         </motion.div>
       </motion.div>
 
@@ -90,7 +93,7 @@ export function Hero() {
         <div className="absolute size-72 rounded-full bg-latte/50 blur-2xl sm:size-[28rem]" />
         <div className="relative size-64 overflow-hidden rounded-full border-4 border-background shadow-xl sm:size-96">
           <Image
-            src={profile.avatarSrc}
+            src={profile.avatarUrl}
             alt={profile.name}
             fill
             sizes="(min-width: 640px) 24rem, 16rem"

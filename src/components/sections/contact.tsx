@@ -4,11 +4,11 @@ import { useState, type FormEvent } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { Mail, Phone, MessageCircle, Loader2, Send } from "lucide-react";
+import type { Profile } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { contactSchema } from "@/lib/contact-schema";
-import { profile } from "@/data/profile";
 
 type FormState = {
   name: string;
@@ -18,31 +18,31 @@ type FormState = {
 
 const initialState: FormState = { name: "", email: "", message: "" };
 
-const contactMethods = [
-  {
-    icon: Mail,
-    label: "Email",
-    value: profile.email,
-    href: `mailto:${profile.email}`,
-  },
-  {
-    icon: Phone,
-    label: "Phone",
-    value: profile.phone,
-    href: `tel:${profile.phone.replace(/\s+/g, "")}`,
-  },
-  {
-    icon: MessageCircle,
-    label: "WhatsApp",
-    value: profile.whatsapp,
-    href: `https://wa.me/${profile.whatsapp.replace(/\D/g, "")}`,
-  },
-];
-
-export function Contact() {
+export function Contact({ profile }: { profile: Profile }) {
   const [form, setForm] = useState<FormState>(initialState);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [submitting, setSubmitting] = useState(false);
+
+  const contactMethods = [
+    {
+      icon: Mail,
+      label: "Email",
+      value: profile.email,
+      href: `mailto:${profile.email}`,
+    },
+    {
+      icon: Phone,
+      label: "Phone",
+      value: profile.phone,
+      href: `tel:${profile.phone.replace(/\s+/g, "")}`,
+    },
+    {
+      icon: MessageCircle,
+      label: "WhatsApp",
+      value: profile.whatsapp,
+      href: `https://wa.me/${profile.whatsapp.replace(/\D/g, "")}`,
+    },
+  ];
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
