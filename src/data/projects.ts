@@ -1,14 +1,15 @@
 export type Project = {
   slug: string;
   name: string;
-  tagline: string;
+  tagline?: string;
   image: string;
-  techStack: string[];
-  description: string;
+  techStack?: string[];
+  description?: string;
   liveUrl: string;
   githubUrl: string;
-  challenges: string[];
-  futureImprovements: string[];
+  challenges?: string[];
+  futureImprovements?: string[];
+  caseStudySlug?: string;
 };
 
 export const projects: Project[] = [
@@ -17,63 +18,45 @@ export const projects: Project[] = [
     name: "Food Delivery Webpage",
     tagline: "A food delivery web page built for Penguin, an independent club",
     image: "/images/projects/foodhub.svg",
-    techStack: ["[Add tech stack]"],
     description:
-      "A food delivery web page built while working with Penguin, an independent club that runs projects across different fields. [Add more detail about who it's for and how it works.]",
+      "A food delivery web page built while working with Penguin, an independent club that runs projects across different fields.",
     liveUrl: "#",
     githubUrl: "#",
-    challenges: ["[Add a challenge you faced building this]"],
-    futureImprovements: ["[Add a planned improvement]"],
   },
   {
     slug: "club-connect",
     name: "Club Connect",
-    tagline: "A web page for linking club members across departments",
+    tagline:
+      "A full-stack platform for managing university clubs, events, and student engagement",
     image: "/images/projects/taskflow.svg",
-    techStack: ["[Add tech stack]"],
-    description:
-      "A web page built for Penguin club to help connect members across different departments. [Add more detail about how it works.]",
+    techStack: ["Next.js", "Express", "TypeScript", "Prisma", "PostgreSQL"],
     liveUrl: "#",
     githubUrl: "#",
-    challenges: ["[Add a challenge you faced building this]"],
-    futureImprovements: ["[Add a planned improvement]"],
+    caseStudySlug: "club-connect",
   },
   {
     slug: "guitar-selling-webpage",
     name: "Guitar Selling Webpage",
     tagline: "A marketplace web page for buying and selling guitars",
     image: "/images/projects/devnotes.svg",
-    techStack: ["[Add tech stack]"],
     description:
-      "A marketplace-style web page for buying and selling guitars, built for Penguin club. [Add more detail about how it works.]",
+      "A marketplace-style web page for buying and selling guitars, built for Penguin club.",
     liveUrl: "#",
     githubUrl: "#",
-    challenges: ["[Add a challenge you faced building this]"],
-    futureImprovements: ["[Add a planned improvement]"],
   },
   {
     slug: "agrosync",
     name: "Agrosync",
-    tagline: "[Add a short tagline for Agrosync]",
     image: "/images/projects/foodhub.svg",
-    techStack: ["[Add tech stack]"],
-    description: "[Add a description of what Agrosync does and who it's for.]",
     liveUrl: "#",
     githubUrl: "#",
-    challenges: ["[Add a challenge you faced building this]"],
-    futureImprovements: ["[Add a planned improvement]"],
   },
   {
     slug: "fixitnow",
     name: "Fixitnow",
-    tagline: "[Add a short tagline for Fixitnow]",
     image: "/images/projects/taskflow.svg",
-    techStack: ["[Add tech stack]"],
-    description: "[Add a description of what Fixitnow does and who it's for.]",
     liveUrl: "#",
     githubUrl: "#",
-    challenges: ["[Add a challenge you faced building this]"],
-    futureImprovements: ["[Add a planned improvement]"],
   },
 ];
 
