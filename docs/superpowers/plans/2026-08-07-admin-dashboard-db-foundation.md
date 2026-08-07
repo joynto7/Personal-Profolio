@@ -444,10 +444,15 @@ git commit -m "Add ICONS lookup map so icon fields can be stored as string keys"
 
 Every string below is transcribed verbatim from the current `src/data/*.ts` files. Do not shorten, reword, or re-punctuate anything.
 
-```ts
-import { PrismaClient } from "@prisma/client";
+**Correction found during execution:** this snippet originally used a bare `new PrismaClient()`, written before Task 1's driver-adapter correction existed. It needs the same `PrismaNeon` adapter Task 1's `src/lib/prisma.ts` uses, plus an explicit `dotenv/config` import — `tsx` (running this script standalone, outside Next.js) does not auto-load `.env` the way Next.js does.
 
-const prisma = new PrismaClient();
+```ts
+import "dotenv/config";
+import { PrismaClient } from "@prisma/client";
+import { PrismaNeon } from "@prisma/adapter-neon";
+
+const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL });
+const prisma = new PrismaClient({ adapter });
 
 const profileData = {
   name: "Joynto Ghosh",
