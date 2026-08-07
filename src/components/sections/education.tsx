@@ -1,10 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { education } from "@/data/education";
+import type { EducationEntry } from "@prisma/client";
 import { TimelineItem } from "@/components/sections/timeline-item";
 
-export function Education() {
+export function Education({ entries }: { entries: EducationEntry[] }) {
   return (
     <section id="education" className="scroll-mt-20 bg-muted py-24">
       <div className="mx-auto max-w-3xl px-6">
@@ -24,15 +24,15 @@ export function Education() {
         </motion.div>
 
         <div className="mt-14">
-          {education.map((entry, i) => (
+          {entries.map((entry, i) => (
             <TimelineItem
-              key={entry.institution}
+              key={entry.id}
               index={i}
-              isLast={i === education.length - 1}
+              isLast={i === entries.length - 1}
               title={`${entry.degree} · ${entry.field}`}
               subtitle={entry.institution}
               period={`${entry.startYear} — ${entry.endYear}`}
-              description={entry.description}
+              description={entry.description ?? undefined}
               bullets={entry.achievements}
             />
           ))}

@@ -9,9 +9,11 @@ import { Contact } from "@/components/sections/contact";
 import { getProfile, prisma } from "@/lib/prisma";
 
 export default async function Home() {
-  const [profile, socials] = await Promise.all([
+  const [profile, socials, education, experience] = await Promise.all([
     getProfile(),
     prisma.social.findMany({ orderBy: { order: "asc" } }),
+    prisma.educationEntry.findMany({ orderBy: { order: "asc" } }),
+    prisma.experienceEntry.findMany({ orderBy: { order: "asc" } }),
   ]);
 
   return (
@@ -19,8 +21,8 @@ export default async function Home() {
       <Hero profile={profile} socials={socials} />
       <About profile={profile} />
       <Skills />
-      <Education />
-      <Experience />
+      <Education entries={education} />
+      <Experience entries={experience} />
       <Projects />
       <CaseStudies />
       <Contact profile={profile} />
