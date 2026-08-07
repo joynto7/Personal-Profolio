@@ -28,6 +28,7 @@
 
 **Files:**
 - Create: `prisma/schema.prisma`
+- Create: `prisma.config.ts`
 - Create: `src/lib/prisma.ts`
 - Modify: `package.json`
 
@@ -41,13 +42,17 @@
 Do not hand-type version numbers into `package.json` — npm writes them.
 
 ```bash
-npm install @prisma/client
+npm install @prisma/client @prisma/adapter-neon
 npm install -D prisma tsx
 ```
 
 - [ ] **Step 2: Create `prisma/schema.prisma`**
 
 Note: `npx prisma init` is deliberately **not** used — it would write a placeholder `DATABASE_URL` into `.env` and could clobber the real value the human put there. Write the file directly instead.
+
+**Correction found during execution (npm resolved Prisma 7.9.1, newer than this plan assumed):** Prisma 7.9.1 removed `datasource { url = env(...) }` from `schema.prisma` entirely — `prisma generate` fails with `P1012` if it's there. The connection URL for Migrate now lives in a new `prisma.config.ts` file (Step 2b below), and — this is the part that isn't optional the way the CLI error message's wording suggests — **the runtime `PrismaClient` also requires an explicit driver adapter**, verified directly: `new PrismaClient()` with no arguments throws `PrismaClientInitializationError: PrismaClient was instantiated without any options. A driver adapter is required to connect to your database.` immediately on construction, before any query. Since this project connects to Neon and deploys to Vercel serverless functions, the Neon-specific adapter (`@prisma/adapter-neon`, using Neon's HTTP/WebSocket-based serverless driver) is the correct choice over the generic `@prisma/adapter-pg` (a raw TCP `pg` connection pool that serverless functions exhaust quickly under concurrent invocations). Verified end-to-end against the real configured database: `new PrismaNeon({ connectionString: process.env.DATABASE_URL })` passed as `adapter` to `new PrismaClient({ adapter })` successfully ran `SELECT 1`.
+
+The schema's `datasource` block therefore has no `url` line:
 
 ```prisma
 generator client {
@@ -56,7 +61,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 /// Singleton — always exactly one row, id 1, written with upsert.
@@ -173,15 +177,40 @@ Two schema notes that the rendering code in later tasks depends on:
 - Prisma scalar list fields (`String[]`) **cannot be nullable** — they default to `[]`. So the old `project.techStack && project.techStack.length > 0` guards collapse to `project.techStack.length > 0`. An empty array is the new "absent".
 - `monochrome` is a non-null `Boolean @default(false)` rather than optional, so `skill.monochrome ? … : …` behaves exactly as it does today with no null handling.
 
+- [ ] **Step 2b: Create `prisma.config.ts`**
+
+This is the new home for the connection URL that Migrate/Studio/`db seed` need — separate from the runtime adapter in Step 3. Goes at the repo root, beside `package.json`, not inside `prisma/`.
+
+```ts
+import "dotenv/config";
+import { defineConfig, env } from "prisma/config";
+
+export default defineConfig({
+  schema: "prisma/schema.prisma",
+  migrations: {
+    path: "prisma/migrations",
+    seed: "tsx prisma/seed.ts",
+  },
+  datasource: {
+    url: env("DATABASE_URL"),
+  },
+});
+```
+
 - [ ] **Step 3: Create `src/lib/prisma.ts`**
+
+Prisma 7.9.1's `PrismaClient` throws immediately if constructed with no arguments — a driver adapter is mandatory, not optional. `PrismaNeon` from `@prisma/adapter-neon` is the adapter, constructed from the same `DATABASE_URL`.
 
 ```ts
 import { cache } from "react";
+import { PrismaNeon } from "@prisma/adapter-neon";
 import { PrismaClient } from "@prisma/client";
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient();
+const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL });
+
+export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
@@ -224,6 +253,7 @@ The three dependency lines npm just added are shown below in the positions npm w
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@prisma/adapter-neon": "^7.0.0",
     "@prisma/client": "^7.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -267,20 +297,47 @@ Expected: `1`.
 If that prints `0` or the file does not exist, **stop and ask the human for their Neon connection string** and let them add it. Do not create a placeholder value and do not continue.
 
 Then run: `npx prisma generate`
-Expected: `Generated Prisma Client (…) to ./node_modules/@prisma/client`.
+Expected: `Loaded Prisma config from prisma.config.ts.` followed by `✔ Generated Prisma Client (v7.9.1) to ./node_modules/@prisma/client`.
 
-If instead it errors that the `prisma-client-js` generator provider is unknown or removed, **stop and ask the human** — the installed Prisma major has changed generator conventions and decision #4 of the design spec (importing types straight from `@prisma/client`) needs revisiting before continuing.
+If instead it errors that the `prisma-client-js` generator provider is unknown or removed, **stop and ask the human** — the installed Prisma major has changed generator conventions again and decision #4 of the design spec (importing types straight from `@prisma/client`) needs revisiting before continuing.
+
+- [ ] **Step 5b: Confirm the runtime client actually connects**
+
+`prisma generate` succeeding does not prove the adapter-based `PrismaClient` in `src/lib/prisma.ts` can actually reach the database — verify that directly, once, with a throwaway script that is never committed:
+
+```bash
+cat > _conn_check.mjs << 'EOF'
+import "dotenv/config";
+import { PrismaNeon } from "@prisma/adapter-neon";
+import { PrismaClient } from "@prisma/client";
+
+const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL });
+const prisma = new PrismaClient({ adapter });
+try {
+  const result = await prisma.$queryRaw`SELECT 1 as ok`;
+  console.log("CONNECT_OK", result);
+} catch (e) {
+  console.error("CONNECT_FAIL:", e.message);
+} finally {
+  await prisma.$disconnect();
+}
+EOF
+node _conn_check.mjs
+rm _conn_check.mjs
+```
+
+Expected: `CONNECT_OK [ { ok: 1 } ]`. If it fails, the error message names the actual problem (bad connection string, network/SSL issue, wrong adapter) — stop and ask the human rather than guessing a fix, since this is talking to their real database.
 
 - [ ] **Step 6: Verify**
 
 Run: `npx tsc --noEmit`
-Expected: no output, exit code 0. This proves `@prisma/client` resolves and `src/lib/prisma.ts` type-checks against the generated client.
+Expected: no output, exit code 0. This proves `@prisma/client` and `@prisma/adapter-neon` resolve and `src/lib/prisma.ts` type-checks against the generated client.
 
 - [ ] **Step 7: Commit**
 
 ```bash
-git add package.json package-lock.json prisma/schema.prisma src/lib/prisma.ts
-git commit -m "Add Prisma schema for portfolio content and a client singleton"
+git add package.json package-lock.json prisma/schema.prisma prisma.config.ts src/lib/prisma.ts
+git commit -m "Add Prisma schema for portfolio content and a Neon-adapter client singleton"
 ```
 
 ---
