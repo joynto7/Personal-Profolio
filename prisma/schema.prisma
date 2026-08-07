@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Singleton — always exactly one row, id 1, written with upsert.
+model Profile {
+  id          Int    @id @default(1)
+  name        String
+  designation String
+  tagline     String
+  location    String
+  avatarUrl   String
+  resumeUrl   String
+  email       String
+  phone       String
+  whatsapp    String
+  bioJourney  String
+  bioEnjoy    String
+  bioHobbies  String
+}
+
+model SkillGroup {
+  id       Int     @id @default(autoincrement())
+  category String  @unique
+  order    Int
+  skills   Skill[]
+}
+
+model Skill {
+  id         Int        @id @default(autoincrement())
+  name       String
+  iconKey    String
+  /// Official brand color (hex).
+  color      String
+  /// Brand color is near-black/white — render theme-adaptive instead so it stays visible in dark mode.
+  monochrome Boolean    @default(false)
+  order      Int
+  groupId    Int
+  group      SkillGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+}
+
+model EducationEntry {
+  id           Int      @id @default(autoincrement())
+  institution  String
+  degree       String
+  field        String
+  startYear    String
+  endYear      String
+  description  String?
+  achievements String[]
+  order        Int
+}
+
+model ExperienceEntry {
+  id          Int      @id @default(autoincrement())
+  company     String
+  role        String
+  startDate   String
+  endDate     String
+  description String
+  highlights  String[]
+  order       Int
+}
+
+model Project {
+  id                 Int      @id @default(autoincrement())
+  slug               String   @unique
+  name               String
+  tagline            String?
+  imageUrl           String
+  techStack          String[]
+  description        String?
+  liveUrl            String?
+  githubUrl          String?
+  challenges         String[]
+  futureImprovements String[]
+  caseStudySlug      String?
+  order              Int
+}
+
+model CaseStudy {
+  id                 Int      @id @default(autoincrement())
+  slug               String   @unique
+  name               String
+  tagline            String
+  imageUrl           String
+  techStack          String[]
+  liveUrl            String?
+  githubUrl          String?
+  overview           String
+  architecture       String
+  systemDesign       String
+  databaseDesign     String?
+  security           String?
+  challenges         String[]
+  lessonsLearned     String[]
+  futureImprovements String[]
+  /// Array of { url: string, caption: string }
+  screenshots        Json     @default("[]")
+  /// Array of { title: string, language: string, code: string }
+  codeSnippets       Json     @default("[]")
+  order              Int
+}
+
+model Social {
+  id      Int    @id @default(autoincrement())
+  label   String
+  url     String
+  iconKey String
+  order   Int
+}
