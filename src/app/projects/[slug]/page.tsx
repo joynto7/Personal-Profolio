@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { ArrowLeft, ExternalLink, Lightbulb, Puzzle } from "lucide-react";
 import { FaGithub } from "react-icons/fa6";
@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!project) return {};
   return {
     title: project.name,
-    description: project.tagline,
+    description: project.tagline ?? project.name,
   };
 }
 
@@ -31,6 +31,7 @@ export default async function ProjectPage({ params }: Props) {
   const project = getProjectBySlug(slug);
 
   if (!project) notFound();
+  if (project.caseStudySlug) redirect(`/case-studies/${project.caseStudySlug}`);
 
   return (
     <article className="mx-auto max-w-4xl px-6 py-16">
@@ -56,15 +57,19 @@ export default async function ProjectPage({ params }: Props) {
       <h1 className="mt-8 font-heading text-3xl font-medium text-foreground sm:text-4xl">
         {project.name}
       </h1>
-      <p className="mt-2 text-lg text-muted-foreground">{project.tagline}</p>
+      {project.tagline && (
+        <p className="mt-2 text-lg text-muted-foreground">{project.tagline}</p>
+      )}
 
-      <div className="mt-5 flex flex-wrap gap-2">
-        {project.techStack.map((tech) => (
-          <Badge key={tech} variant="secondary">
-            {tech}
-          </Badge>
-        ))}
-      </div>
+      {project.techStack && project.techStack.length > 0 && (
+        <div className="mt-5 flex flex-wrap gap-2">
+          {project.techStack.map((tech) => (
+            <Badge key={tech} variant="secondary">
+              {tech}
+            </Badge>
+          ))}
+        </div>
+      )}
 
       <div className="mt-6 flex flex-wrap gap-3">
         <Button asChild>
@@ -81,56 +86,65 @@ export default async function ProjectPage({ params }: Props) {
         </Button>
       </div>
 
-      <section className="mt-12">
-        <h2 className="font-heading text-xl font-medium text-foreground">
-          About This Project
-        </h2>
-        <p className="mt-3 leading-relaxed text-muted-foreground">
-          {project.description}
-        </p>
-      </section>
-
-      <div className="mt-12 grid gap-8 md:grid-cols-2">
-        <section>
-          <div className="flex items-center gap-2">
-            <Puzzle className="size-5 text-primary" />
-            <h2 className="font-heading text-xl font-medium text-foreground">
-              Challenges Faced
-            </h2>
-          </div>
-          <ul className="mt-4 flex flex-col gap-3">
-            {project.challenges.map((challenge) => (
-              <li
-                key={challenge}
-                className="flex gap-2.5 text-sm leading-relaxed text-muted-foreground"
-              >
-                <span className="mt-2 size-1.5 shrink-0 rounded-full bg-caramel" />
-                {challenge}
-              </li>
-            ))}
-          </ul>
+      {project.description && (
+        <section className="mt-12">
+          <h2 className="font-heading text-xl font-medium text-foreground">
+            About This Project
+          </h2>
+          <p className="mt-3 leading-relaxed text-muted-foreground">
+            {project.description}
+          </p>
         </section>
+      )}
 
-        <section>
-          <div className="flex items-center gap-2">
-            <Lightbulb className="size-5 text-primary" />
-            <h2 className="font-heading text-xl font-medium text-foreground">
-              Future Improvements
-            </h2>
-          </div>
-          <ul className="mt-4 flex flex-col gap-3">
-            {project.futureImprovements.map((improvement) => (
-              <li
-                key={improvement}
-                className="flex gap-2.5 text-sm leading-relaxed text-muted-foreground"
-              >
-                <span className="mt-2 size-1.5 shrink-0 rounded-full bg-caramel" />
-                {improvement}
-              </li>
-            ))}
-          </ul>
-        </section>
-      </div>
+      {((project.challenges?.length ?? 0) > 0 ||
+        (project.futureImprovements?.length ?? 0) > 0) && (
+        <div className="mt-12 grid gap-8 md:grid-cols-2">
+          {project.challenges && project.challenges.length > 0 && (
+            <section>
+              <div className="flex items-center gap-2">
+                <Puzzle className="size-5 text-primary" />
+                <h2 className="font-heading text-xl font-medium text-foreground">
+                  Challenges Faced
+                </h2>
+              </div>
+              <ul className="mt-4 flex flex-col gap-3">
+                {project.challenges.map((challenge) => (
+                  <li
+                    key={challenge}
+                    className="flex gap-2.5 text-sm leading-relaxed text-muted-foreground"
+                  >
+                    <span className="mt-2 size-1.5 shrink-0 rounded-full bg-caramel" />
+                    {challenge}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {project.futureImprovements && project.futureImprovements.length > 0 && (
+            <section>
+              <div className="flex items-center gap-2">
+                <Lightbulb className="size-5 text-primary" />
+                <h2 className="font-heading text-xl font-medium text-foreground">
+                  Future Improvements
+                </h2>
+              </div>
+              <ul className="mt-4 flex flex-col gap-3">
+                {project.futureImprovements.map((improvement) => (
+                  <li
+                    key={improvement}
+                    className="flex gap-2.5 text-sm leading-relaxed text-muted-foreground"
+                  >
+                    <span className="mt-2 size-1.5 shrink-0 rounded-full bg-caramel" />
+                    {improvement}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </div>
+      )}
     </article>
   );
 }
