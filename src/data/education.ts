@@ -23,11 +23,4 @@ export const education: EducationEntry[] = [
       "Built a project for connecting the clubs of all the departments of the university to a centralized platform",
     ],
   },
-  {
-    institution: " Govt.Debendra College, Manikganj",
-    degree: "Higher Secondary (HSC)",
-    field: "Science (Computer Science)",
-    startYear: "2020",
-    endYear: "2022",
-  },
 ];

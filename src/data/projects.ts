@@ -51,6 +51,30 @@ export const projects: Project[] = [
     challenges: ["[Add a challenge you faced building this]"],
     futureImprovements: ["[Add a planned improvement]"],
   },
+  {
+    slug: "agrosync",
+    name: "Agrosync",
+    tagline: "[Add a short tagline for Agrosync]",
+    image: "/images/projects/foodhub.svg",
+    techStack: ["[Add tech stack]"],
+    description: "[Add a description of what Agrosync does and who it's for.]",
+    liveUrl: "#",
+    githubUrl: "#",
+    challenges: ["[Add a challenge you faced building this]"],
+    futureImprovements: ["[Add a planned improvement]"],
+  },
+  {
+    slug: "fixitnow",
+    name: "Fixitnow",
+    tagline: "[Add a short tagline for Fixitnow]",
+    image: "/images/projects/taskflow.svg",
+    techStack: ["[Add tech stack]"],
+    description: "[Add a description of what Fixitnow does and who it's for.]",
+    liveUrl: "#",
+    githubUrl: "#",
+    challenges: ["[Add a challenge you faced building this]"],
+    futureImprovements: ["[Add a planned improvement]"],
+  },
 ];
 
 export function getProjectBySlug(slug: string) {

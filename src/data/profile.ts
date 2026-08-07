@@ -6,7 +6,7 @@ export const profile = {
   location: "Dhaka, Bangladesh",
   avatarSrc: "/images/IMG_6159.jpeg",
   resumeUrl: "/CV.pdf",
-  email: "joyntoghosh7@gmail.com",
+  email: "jg.contact.me07@gmail.com",
   phone: "+880 1305 531529",
   whatsapp: "+880 1305 531529",
   bio: {
