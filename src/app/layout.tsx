@@ -5,8 +5,11 @@ import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
-import { profile } from "@/data/profile";
+import { getProfile, prisma } from "@/lib/prisma";
 import "./globals.css";
+
+// Every page reads live content from Postgres — nothing here may be prerendered.
+export const dynamic = "force-dynamic";
 
 const geistSans = Geist({
   variable: "--font-sans",
@@ -24,30 +27,39 @@ const fraunces = Fraunces({
   axes: ["opsz", "SOFT", "WONK"],
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
-  title: {
-    default: `${profile.name} — ${profile.designation}`,
-    template: `%s — ${profile.name}`,
-  },
-  description: profile.tagline,
-  openGraph: {
-    title: `${profile.name} — ${profile.designation}`,
-    description: profile.tagline,
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${profile.name} — ${profile.designation}`,
-    description: profile.tagline,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const profile = await getProfile();
 
-export default function RootLayout({
+  return {
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+    title: {
+      default: `${profile.name} — ${profile.designation}`,
+      template: `%s — ${profile.name}`,
+    },
+    description: profile.tagline,
+    openGraph: {
+      title: `${profile.name} — ${profile.designation}`,
+      description: profile.tagline,
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${profile.name} — ${profile.designation}`,
+      description: profile.tagline,
+    },
+  };
+}
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [profile, socials] = await Promise.all([
+    getProfile(),
+    prisma.social.findMany({ orderBy: { order: "asc" } }),
+  ]);
+
   return (
     <html
       lang="en"
@@ -58,9 +70,9 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <TooltipProvider>
-            <Navbar />
+            <Navbar profile={profile} />
             {children}
-            <Footer />
+            <Footer profile={profile} socials={socials} />
             <Toaster />
           </TooltipProvider>
         </ThemeProvider>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Menu } from "lucide-react";
+import type { Profile } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -13,10 +14,9 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 import { navLinks } from "@/data/nav-links";
-import { profile } from "@/data/profile";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 
-export function Navbar() {
+export function Navbar({ profile }: { profile: Profile }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 

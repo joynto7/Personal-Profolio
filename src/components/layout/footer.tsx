@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { profile } from "@/data/profile";
-import { socials } from "@/data/socials";
+import type { Profile, Social } from "@prisma/client";
 import { navLinks } from "@/data/nav-links";
+import { ICONS } from "@/lib/icons";
 
-export function Footer() {
+export function Footer({ profile, socials }: { profile: Profile; socials: Social[] }) {
   const year = new Date().getFullYear();
 
   return (
@@ -36,18 +36,21 @@ export function Footer() {
         <div className="flex flex-col gap-3">
           <span className="text-sm font-medium text-latte">Connect</span>
           <div className="flex gap-3">
-            {socials.map((social) => (
-              <a
-                key={social.label}
-                href={social.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={social.label}
-                className="flex size-9 items-center justify-center rounded-full bg-warm-white/10 text-warm-white transition-colors hover:bg-caramel hover:text-espresso"
-              >
-                <social.icon className="size-4" />
-              </a>
-            ))}
+            {socials.map((social) => {
+              const Icon = ICONS[social.iconKey];
+              return (
+                <a
+                  key={social.id}
+                  href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={social.label}
+                  className="flex size-9 items-center justify-center rounded-full bg-warm-white/10 text-warm-white transition-colors hover:bg-caramel hover:text-espresso"
+                >
+                  {Icon && <Icon className="size-4" />}
+                </a>
+              );
+            })}
           </div>
         </div>
       </div>
