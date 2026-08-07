@@ -1,10 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { projects } from "@/data/projects";
+import type { Project } from "@prisma/client";
 import { ProjectCard } from "@/components/sections/project-card";
 
-export function Projects() {
+export function Projects({ projects }: { projects: Project[] }) {
   if (projects.length === 0) return null;
 
   return (

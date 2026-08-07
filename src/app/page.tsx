@@ -9,16 +9,19 @@ import { Contact } from "@/components/sections/contact";
 import { getProfile, prisma } from "@/lib/prisma";
 
 export default async function Home() {
-  const [profile, socials, skillGroups, education, experience] = await Promise.all([
-    getProfile(),
-    prisma.social.findMany({ orderBy: { order: "asc" } }),
-    prisma.skillGroup.findMany({
-      orderBy: { order: "asc" },
-      include: { skills: { orderBy: { order: "asc" } } },
-    }),
-    prisma.educationEntry.findMany({ orderBy: { order: "asc" } }),
-    prisma.experienceEntry.findMany({ orderBy: { order: "asc" } }),
-  ]);
+  const [profile, socials, skillGroups, education, experience, projects, caseStudies] =
+    await Promise.all([
+      getProfile(),
+      prisma.social.findMany({ orderBy: { order: "asc" } }),
+      prisma.skillGroup.findMany({
+        orderBy: { order: "asc" },
+        include: { skills: { orderBy: { order: "asc" } } },
+      }),
+      prisma.educationEntry.findMany({ orderBy: { order: "asc" } }),
+      prisma.experienceEntry.findMany({ orderBy: { order: "asc" } }),
+      prisma.project.findMany({ orderBy: { order: "asc" } }),
+      prisma.caseStudy.findMany({ orderBy: { order: "asc" } }),
+    ]);
 
   return (
     <main className="flex flex-1 flex-col">
@@ -27,8 +30,8 @@ export default async function Home() {
       <Skills skillGroups={skillGroups} />
       <Education entries={education} />
       <Experience entries={experience} />
-      <Projects />
-      <CaseStudies />
+      <Projects projects={projects} />
+      <CaseStudies caseStudies={caseStudies} />
       <Contact profile={profile} />
     </main>
   );

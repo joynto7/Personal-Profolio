@@ -4,10 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import type { CaseStudy } from "@prisma/client";
 import { Badge } from "@/components/ui/badge";
-import { caseStudies } from "@/data/case-studies";
 
-export function CaseStudies() {
+export function CaseStudies({ caseStudies }: { caseStudies: CaseStudy[] }) {
   if (caseStudies.length === 0) return null;
 
   return (
@@ -44,7 +44,7 @@ export function CaseStudies() {
             >
               <div className="relative aspect-video shrink-0 overflow-hidden sm:aspect-square sm:w-64">
                 <Image
-                  src={caseStudy.image}
+                  src={caseStudy.imageUrl}
                   alt={caseStudy.name}
                   fill
                   sizes="(min-width: 640px) 16rem, 100vw"

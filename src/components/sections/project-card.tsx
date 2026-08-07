@@ -4,8 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import type { Project } from "@prisma/client";
 import { Badge } from "@/components/ui/badge";
-import type { Project } from "@/data/projects";
 
 export function ProjectCard({ project, index }: { project: Project; index: number }) {
   const href = project.caseStudySlug
@@ -22,7 +22,7 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
     >
       <div className="relative aspect-video overflow-hidden">
         <Image
-          src={project.image}
+          src={project.imageUrl}
           alt={project.name}
           fill
           sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
@@ -45,7 +45,7 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
           </p>
         )}
 
-        {project.techStack && project.techStack.length > 0 && (
+        {project.techStack.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-1.5">
             {project.techStack.slice(0, 4).map((tech) => (
               <Badge key={tech} variant="secondary">
