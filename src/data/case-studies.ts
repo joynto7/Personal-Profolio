@@ -5,7 +5,6 @@ export type CaseStudy = {
   image: string;
   techStack: string[];
   liveUrl?: string;
-  repoStatus: "public" | "private";
   githubUrl?: string;
   overview: string;
   architecture: string;
@@ -35,7 +34,6 @@ export const caseStudies: CaseStudy[] = [
       "Socket.io",
       "Tailwind CSS v4",
     ],
-    repoStatus: "private",
     overview:
       "Club Connect covers the full lifecycle of campus club activity for three kinds of users. Students discover and join clubs, RSVP to events (including paid ones), book venues and equipment, follow clubs, and get real-time notifications. Club officers manage membership, run events with QR check-in, post announcements, and track a club budget. Admins moderate content, manage users and clubs, and review a full audit log.",
     architecture:

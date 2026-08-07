@@ -5,8 +5,8 @@ export type Project = {
   image: string;
   techStack?: string[];
   description?: string;
-  liveUrl: string;
-  githubUrl: string;
+  liveUrl?: string;
+  githubUrl?: string;
   challenges?: string[];
   futureImprovements?: string[];
   caseStudySlug?: string;
@@ -20,8 +20,6 @@ export const projects: Project[] = [
     image: "/images/projects/foodhub.svg",
     description:
       "A food delivery web page built while working with Penguin, an independent club that runs projects across different fields.",
-    liveUrl: "#",
-    githubUrl: "#",
   },
   {
     slug: "club-connect",
@@ -30,8 +28,6 @@ export const projects: Project[] = [
       "A full-stack platform for managing university clubs, events, and student engagement",
     image: "/images/projects/taskflow.svg",
     techStack: ["Next.js", "Express", "TypeScript", "Prisma", "PostgreSQL"],
-    liveUrl: "#",
-    githubUrl: "#",
     caseStudySlug: "club-connect",
   },
   {
@@ -41,22 +37,16 @@ export const projects: Project[] = [
     image: "/images/projects/devnotes.svg",
     description:
       "A marketplace-style web page for buying and selling guitars, built for Penguin club.",
-    liveUrl: "#",
-    githubUrl: "#",
   },
   {
     slug: "agrosync",
     name: "Agrosync",
     image: "/images/projects/foodhub.svg",
-    liveUrl: "#",
-    githubUrl: "#",
   },
   {
     slug: "fixitnow",
     name: "Fixitnow",
     image: "/images/projects/taskflow.svg",
-    liveUrl: "#",
-    githubUrl: "#",
   },
 ];
 

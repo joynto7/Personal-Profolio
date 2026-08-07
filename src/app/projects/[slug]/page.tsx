@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import { ArrowLeft, ExternalLink, Lightbulb, Puzzle } from "lucide-react";
 import { FaGithub } from "react-icons/fa6";
@@ -31,10 +31,10 @@ export default async function ProjectPage({ params }: Props) {
   const project = getProjectBySlug(slug);
 
   if (!project) notFound();
-  if (project.caseStudySlug) redirect(`/case-studies/${project.caseStudySlug}`);
+  if (project.caseStudySlug) permanentRedirect(`/case-studies/${project.caseStudySlug}`);
 
   return (
-    <article className="mx-auto max-w-4xl px-6 py-16">
+    <main className="mx-auto max-w-4xl px-6 py-16">
       <Link
         href="/#projects"
         className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
@@ -71,20 +71,26 @@ export default async function ProjectPage({ params }: Props) {
         </div>
       )}
 
-      <div className="mt-6 flex flex-wrap gap-3">
-        <Button asChild>
-          <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">
-            <ExternalLink className="size-4" />
-            Live Project
-          </a>
-        </Button>
-        <Button variant="outline" asChild>
-          <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
-            <FaGithub className="size-4" />
-            GitHub Repo
-          </a>
-        </Button>
-      </div>
+      {(project.liveUrl || project.githubUrl) && (
+        <div className="mt-6 flex flex-wrap gap-3">
+          {project.liveUrl && (
+            <Button asChild>
+              <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="size-4" />
+                Live Project
+              </a>
+            </Button>
+          )}
+          {project.githubUrl && (
+            <Button variant="outline" asChild>
+              <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
+                <FaGithub className="size-4" />
+                GitHub Repo
+              </a>
+            </Button>
+          )}
+        </div>
+      )}
 
       {project.description && (
         <section className="mt-12">
@@ -145,6 +151,6 @@ export default async function ProjectPage({ params }: Props) {
           )}
         </div>
       )}
-    </article>
+    </main>
   );
 }

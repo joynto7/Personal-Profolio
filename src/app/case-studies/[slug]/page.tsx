@@ -41,7 +41,7 @@ export default async function CaseStudyPage({ params }: Props) {
   if (!caseStudy) notFound();
 
   return (
-    <article className="mx-auto max-w-4xl px-6 py-16">
+    <main className="mx-auto max-w-4xl px-6 py-16">
       <Link
         href="/#projects"
         className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
@@ -86,7 +86,7 @@ export default async function CaseStudyPage({ params }: Props) {
             </a>
           </Button>
         )}
-        {caseStudy.repoStatus === "public" && caseStudy.githubUrl ? (
+        {caseStudy.githubUrl ? (
           <Button variant="outline" asChild>
             <a href={caseStudy.githubUrl} target="_blank" rel="noopener noreferrer">
               <ExternalLink className="size-4" />
@@ -211,7 +211,13 @@ export default async function CaseStudyPage({ params }: Props) {
             {caseStudy.screenshots.map((shot) => (
               <figure key={shot.src}>
                 <div className="relative aspect-video overflow-hidden rounded-xl border border-border">
-                  <Image src={shot.src} alt={shot.caption} fill className="object-cover" />
+                  <Image
+                    src={shot.src}
+                    alt={shot.caption}
+                    fill
+                    sizes="(min-width: 640px) 28rem, 100vw"
+                    className="object-cover"
+                  />
                 </div>
                 <figcaption className="mt-2 text-sm text-muted-foreground">
                   {shot.caption}
@@ -242,6 +248,6 @@ export default async function CaseStudyPage({ params }: Props) {
           </div>
         </section>
       )}
-    </article>
+    </main>
   );
 }
