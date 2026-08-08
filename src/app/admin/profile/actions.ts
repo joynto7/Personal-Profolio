@@ -7,6 +7,7 @@ import { profileSchema } from "@/lib/profile-schema";
 export type ProfileFormState = {
   errors?: Partial<Record<keyof typeof profileSchema.shape, string>>;
   success?: boolean;
+  message?: string;
 };
 
 export async function updateProfile(
@@ -25,9 +26,14 @@ export async function updateProfile(
     return { errors };
   }
 
-  await prisma.profile.update({ where: { id: 1 }, data: parsed.data });
-  revalidatePath("/admin/profile");
-  revalidatePath("/");
+  try {
+    await prisma.profile.update({ where: { id: 1 }, data: parsed.data });
+    revalidatePath("/admin/profile");
+    revalidatePath("/");
+  } catch (error) {
+    console.error("Failed to update profile:", error);
+    return { message: "Could not save. Please try again." };
+  }
 
   return { success: true };
 }

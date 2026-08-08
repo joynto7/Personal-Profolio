@@ -15,6 +15,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
 
   useEffect(() => {
     if (state.success) toast.success("Profile updated.");
+    if (state.message) toast.error(state.message);
   }, [state]);
 
   return (

@@ -26,11 +26,29 @@ export function AdminField({
         {label}
       </label>
       {textarea ? (
-        <Textarea id={name} name={name} defaultValue={defaultValue} rows={rows} />
+        <Textarea
+          id={name}
+          name={name}
+          defaultValue={defaultValue}
+          rows={rows}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${name}-error` : undefined}
+        />
       ) : (
-        <Input id={name} name={name} type={type} defaultValue={defaultValue} />
+        <Input
+          id={name}
+          name={name}
+          type={type}
+          defaultValue={defaultValue}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${name}-error` : undefined}
+        />
       )}
-      {error && <p className="mt-1.5 text-xs text-destructive">{error}</p>}
+      {error && (
+        <p id={`${name}-error`} className="mt-1.5 text-xs text-destructive">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
