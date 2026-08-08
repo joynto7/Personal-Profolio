@@ -308,7 +308,7 @@ export function EducationEntryForm(props: Props) {
   useEffect(() => {
     if (state.success) toast.success("Education entry updated.");
     if (state.message) toast.error(state.message);
-  }, [state.success, state.message]);
+  }, [state]);
 
   return (
     <form action={formAction} className="flex flex-col gap-5">
@@ -792,7 +792,7 @@ export function ExperienceEntryForm(props: Props) {
   useEffect(() => {
     if (state.success) toast.success("Experience entry updated.");
     if (state.message) toast.error(state.message);
-  }, [state.success, state.message]);
+  }, [state]);
 
   return (
     <form action={formAction} className="flex flex-col gap-5">
