@@ -15,7 +15,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
 
   useEffect(() => {
     if (state.success) toast.success("Profile updated.");
-  }, [state.success]);
+  }, [state]);
 
   return (
     <form action={formAction} className="flex flex-col gap-5">
