@@ -18,12 +18,12 @@ const sections = [
   },
   {
     label: "Education",
-    href: null,
+    href: "/admin/education",
     description: "Academic timeline entries",
   },
   {
     label: "Experience",
-    href: null,
+    href: "/admin/experience",
     description: "Work timeline entries",
   },
   {
