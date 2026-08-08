@@ -9,6 +9,7 @@ type AdminFieldProps = {
   type?: string;
   textarea?: boolean;
   rows?: number;
+  id?: string;
 };
 
 export function AdminField({
@@ -19,33 +20,36 @@ export function AdminField({
   type = "text",
   textarea = false,
   rows = 3,
+  id,
 }: AdminFieldProps) {
+  const fieldId = id ?? name;
+
   return (
     <div>
-      <label htmlFor={name} className="mb-1.5 block text-sm font-medium text-foreground">
+      <label htmlFor={fieldId} className="mb-1.5 block text-sm font-medium text-foreground">
         {label}
       </label>
       {textarea ? (
         <Textarea
-          id={name}
+          id={fieldId}
           name={name}
           defaultValue={defaultValue}
           rows={rows}
           aria-invalid={!!error}
-          aria-describedby={error ? `${name}-error` : undefined}
+          aria-describedby={error ? `${fieldId}-error` : undefined}
         />
       ) : (
         <Input
-          id={name}
+          id={fieldId}
           name={name}
           type={type}
           defaultValue={defaultValue}
           aria-invalid={!!error}
-          aria-describedby={error ? `${name}-error` : undefined}
+          aria-describedby={error ? `${fieldId}-error` : undefined}
         />
       )}
       {error && (
-        <p id={`${name}-error`} className="mt-1.5 text-xs text-destructive">
+        <p id={`${fieldId}-error`} className="mt-1.5 text-xs text-destructive">
           {error}
         </p>
       )}

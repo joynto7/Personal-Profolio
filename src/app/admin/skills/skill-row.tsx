@@ -36,6 +36,7 @@ export function SkillRow({ skill, isFirst, isLast }: Props) {
         <AdminField
           label="Name"
           name="name"
+          id={`name-${skill.id}`}
           defaultValue={state.values?.name ?? skill.name}
           error={state.errors?.name}
         />
@@ -65,6 +66,7 @@ export function SkillRow({ skill, isFirst, isLast }: Props) {
         <AdminField
           label="Color"
           name="color"
+          id={`color-${skill.id}`}
           defaultValue={state.values?.color ?? skill.color}
           error={state.errors?.color}
         />
