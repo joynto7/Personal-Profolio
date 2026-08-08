@@ -8,6 +8,7 @@ export const experienceEntrySchema = z.object({
   description: z.string().trim().min(1, "Description is required").max(2000),
   highlights: z
     .string()
+    .max(5000)
     .transform((value) =>
       value
         .split("\n")

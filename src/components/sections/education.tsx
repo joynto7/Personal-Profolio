@@ -23,20 +23,26 @@ export function Education({ entries }: { entries: EducationEntry[] }) {
           </h2>
         </motion.div>
 
-        <div className="mt-14">
-          {entries.map((entry, i) => (
-            <TimelineItem
-              key={entry.id}
-              index={i}
-              isLast={i === entries.length - 1}
-              title={`${entry.degree} · ${entry.field}`}
-              subtitle={entry.institution}
-              period={`${entry.startYear} — ${entry.endYear}`}
-              description={entry.description ?? undefined}
-              bullets={entry.achievements}
-            />
-          ))}
-        </div>
+        {entries.length === 0 ? (
+          <p className="mt-14 text-center text-muted-foreground">
+            Nothing to show here yet — check back soon.
+          </p>
+        ) : (
+          <div className="mt-14">
+            {entries.map((entry, i) => (
+              <TimelineItem
+                key={entry.id}
+                index={i}
+                isLast={i === entries.length - 1}
+                title={`${entry.degree} · ${entry.field}`}
+                subtitle={entry.institution}
+                period={`${entry.startYear} — ${entry.endYear}`}
+                description={entry.description ?? undefined}
+                bullets={entry.achievements}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

@@ -45,26 +45,37 @@ export default async function AdminExperiencePage() {
             <div className="flex shrink-0 items-center gap-1">
               {index > 0 && (
                 <form action={moveExperienceEntry.bind(null, entry.id, "up")}>
-                  <Button type="submit" variant="ghost" size="icon-sm" aria-label="Move up">
+                  <Button
+                    type="submit"
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-label={`Move ${entry.company} up`}
+                  >
                     <ArrowUp className="size-4" />
                   </Button>
                 </form>
               )}
               {index < entries.length - 1 && (
                 <form action={moveExperienceEntry.bind(null, entry.id, "down")}>
-                  <Button type="submit" variant="ghost" size="icon-sm" aria-label="Move down">
+                  <Button
+                    type="submit"
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-label={`Move ${entry.company} down`}
+                  >
                     <ArrowDown className="size-4" />
                   </Button>
                 </form>
               )}
               <Button asChild variant="ghost" size="icon-sm">
-                <Link href={`/admin/experience/${entry.id}`} aria-label="Edit">
+                <Link href={`/admin/experience/${entry.id}`} aria-label={`Edit ${entry.company}`}>
                   <Pencil className="size-4" />
                 </Link>
               </Button>
               <ConfirmDeleteForm
                 action={deleteExperienceEntry.bind(null, entry.id)}
                 confirmMessage={`Delete this experience entry (${entry.company})?`}
+                entryLabel={entry.company}
               />
             </div>
           </li>

@@ -14,7 +14,7 @@ type Props = {
 export default async function EditEducationEntryPage({ params }: Props) {
   const { id } = await params;
   const numericId = Number(id);
-  if (Number.isNaN(numericId)) notFound();
+  if (!Number.isInteger(numericId)) notFound();
 
   const entry = await prisma.educationEntry.findUnique({ where: { id: numericId } });
   if (!entry) notFound();

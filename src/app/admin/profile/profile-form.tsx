@@ -20,17 +20,22 @@ export function ProfileForm({ profile }: { profile: Profile }) {
 
   return (
     <form action={formAction} className="flex flex-col gap-5">
-      <AdminField label="Name" name="name" defaultValue={profile.name} error={state.errors?.name} />
+      <AdminField
+        label="Name"
+        name="name"
+        defaultValue={state.values?.name ?? profile.name}
+        error={state.errors?.name}
+      />
       <AdminField
         label="Designation"
         name="designation"
-        defaultValue={profile.designation}
+        defaultValue={state.values?.designation ?? profile.designation}
         error={state.errors?.designation}
       />
       <AdminField
         label="Tagline"
         name="tagline"
-        defaultValue={profile.tagline}
+        defaultValue={state.values?.tagline ?? profile.tagline}
         error={state.errors?.tagline}
         textarea
         rows={2}
@@ -38,39 +43,44 @@ export function ProfileForm({ profile }: { profile: Profile }) {
       <AdminField
         label="Location"
         name="location"
-        defaultValue={profile.location}
+        defaultValue={state.values?.location ?? profile.location}
         error={state.errors?.location}
       />
       <AdminField
         label="Avatar URL"
         name="avatarUrl"
-        defaultValue={profile.avatarUrl}
+        defaultValue={state.values?.avatarUrl ?? profile.avatarUrl}
         error={state.errors?.avatarUrl}
       />
       <AdminField
         label="Resume URL"
         name="resumeUrl"
-        defaultValue={profile.resumeUrl}
+        defaultValue={state.values?.resumeUrl ?? profile.resumeUrl}
         error={state.errors?.resumeUrl}
       />
       <AdminField
         label="Email"
         name="email"
         type="email"
-        defaultValue={profile.email}
+        defaultValue={state.values?.email ?? profile.email}
         error={state.errors?.email}
       />
-      <AdminField label="Phone" name="phone" defaultValue={profile.phone} error={state.errors?.phone} />
+      <AdminField
+        label="Phone"
+        name="phone"
+        defaultValue={state.values?.phone ?? profile.phone}
+        error={state.errors?.phone}
+      />
       <AdminField
         label="WhatsApp"
         name="whatsapp"
-        defaultValue={profile.whatsapp}
+        defaultValue={state.values?.whatsapp ?? profile.whatsapp}
         error={state.errors?.whatsapp}
       />
       <AdminField
         label="Bio — Journey"
         name="bioJourney"
-        defaultValue={profile.bioJourney}
+        defaultValue={state.values?.bioJourney ?? profile.bioJourney}
         error={state.errors?.bioJourney}
         textarea
         rows={5}
@@ -78,7 +88,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
       <AdminField
         label="Bio — What I Enjoy"
         name="bioEnjoy"
-        defaultValue={profile.bioEnjoy}
+        defaultValue={state.values?.bioEnjoy ?? profile.bioEnjoy}
         error={state.errors?.bioEnjoy}
         textarea
         rows={5}
@@ -86,7 +96,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
       <AdminField
         label="Bio — Hobbies"
         name="bioHobbies"
-        defaultValue={profile.bioHobbies}
+        defaultValue={state.values?.bioHobbies ?? profile.bioHobbies}
         error={state.errors?.bioHobbies}
         textarea
         rows={5}

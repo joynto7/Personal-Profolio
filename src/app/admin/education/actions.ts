@@ -10,6 +10,7 @@ export type EducationEntryFormState = {
   errors?: Partial<Record<keyof typeof educationEntrySchema.shape, string>>;
   success?: boolean;
   message?: string;
+  values?: Record<string, string>;
 };
 
 function fieldErrors(error: z.ZodError) {
@@ -29,7 +30,7 @@ export async function createEducationEntry(
   const parsed = educationEntrySchema.safeParse(raw);
 
   if (!parsed.success) {
-    return { errors: fieldErrors(parsed.error) };
+    return { errors: fieldErrors(parsed.error), values: raw as Record<string, string> };
   }
 
   try {
@@ -39,7 +40,7 @@ export async function createEducationEntry(
     });
   } catch (error) {
     console.error("Failed to create education entry:", error);
-    return { message: "Could not save. Please try again." };
+    return { message: "Could not save. Please try again.", values: raw as Record<string, string> };
   }
 
   revalidatePath("/admin/education");
@@ -56,14 +57,14 @@ export async function updateEducationEntry(
   const parsed = educationEntrySchema.safeParse(raw);
 
   if (!parsed.success) {
-    return { errors: fieldErrors(parsed.error) };
+    return { errors: fieldErrors(parsed.error), values: raw as Record<string, string> };
   }
 
   try {
     await prisma.educationEntry.update({ where: { id }, data: parsed.data });
   } catch (error) {
     console.error("Failed to update education entry:", error);
-    return { message: "Could not save. Please try again." };
+    return { message: "Could not save. Please try again.", values: raw as Record<string, string> };
   }
 
   revalidatePath("/admin/education");

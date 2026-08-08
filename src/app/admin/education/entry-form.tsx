@@ -38,32 +38,37 @@ export function EducationEntryForm(props: Props) {
       <AdminField
         label="Institution"
         name="institution"
-        defaultValue={entry.institution}
+        defaultValue={state.values?.institution ?? entry.institution}
         error={state.errors?.institution}
       />
-      <AdminField label="Degree" name="degree" defaultValue={entry.degree} error={state.errors?.degree} />
+      <AdminField
+        label="Degree"
+        name="degree"
+        defaultValue={state.values?.degree ?? entry.degree}
+        error={state.errors?.degree}
+      />
       <AdminField
         label="Field of Study"
         name="field"
-        defaultValue={entry.field}
+        defaultValue={state.values?.field ?? entry.field}
         error={state.errors?.field}
       />
       <AdminField
         label="Start Year"
         name="startYear"
-        defaultValue={entry.startYear}
+        defaultValue={state.values?.startYear ?? entry.startYear}
         error={state.errors?.startYear}
       />
       <AdminField
         label="End Year"
         name="endYear"
-        defaultValue={entry.endYear}
+        defaultValue={state.values?.endYear ?? entry.endYear}
         error={state.errors?.endYear}
       />
       <AdminField
         label="Description"
         name="description"
-        defaultValue={entry.description ?? ""}
+        defaultValue={state.values?.description ?? (entry.description ?? "")}
         error={state.errors?.description}
         textarea
         rows={3}
@@ -71,7 +76,7 @@ export function EducationEntryForm(props: Props) {
       <AdminField
         label="Achievements (one per line)"
         name="achievements"
-        defaultValue={entry.achievements.join("\n")}
+        defaultValue={state.values?.achievements ?? entry.achievements.join("\n")}
         error={state.errors?.achievements}
         textarea
         rows={4}

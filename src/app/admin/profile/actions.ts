@@ -8,6 +8,7 @@ export type ProfileFormState = {
   errors?: Partial<Record<keyof typeof profileSchema.shape, string>>;
   success?: boolean;
   message?: string;
+  values?: Record<string, string>;
 };
 
 export async function updateProfile(
@@ -23,7 +24,7 @@ export async function updateProfile(
       const field = issue.path[0] as keyof typeof profileSchema.shape;
       if (!errors[field]) errors[field] = issue.message;
     }
-    return { errors };
+    return { errors, values: raw as Record<string, string> };
   }
 
   try {
@@ -32,7 +33,7 @@ export async function updateProfile(
     revalidatePath("/");
   } catch (error) {
     console.error("Failed to update profile:", error);
-    return { message: "Could not save. Please try again." };
+    return { message: "Could not save. Please try again.", values: raw as Record<string, string> };
   }
 
   return { success: true };

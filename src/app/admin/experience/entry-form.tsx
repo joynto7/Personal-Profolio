@@ -34,24 +34,34 @@ export function ExperienceEntryForm(props: Props) {
 
   return (
     <form action={formAction} className="flex flex-col gap-5">
-      <AdminField label="Company" name="company" defaultValue={entry.company} error={state.errors?.company} />
-      <AdminField label="Role" name="role" defaultValue={entry.role} error={state.errors?.role} />
+      <AdminField
+        label="Company"
+        name="company"
+        defaultValue={state.values?.company ?? entry.company}
+        error={state.errors?.company}
+      />
+      <AdminField
+        label="Role"
+        name="role"
+        defaultValue={state.values?.role ?? entry.role}
+        error={state.errors?.role}
+      />
       <AdminField
         label="Start Date"
         name="startDate"
-        defaultValue={entry.startDate}
+        defaultValue={state.values?.startDate ?? entry.startDate}
         error={state.errors?.startDate}
       />
       <AdminField
         label="End Date"
         name="endDate"
-        defaultValue={entry.endDate}
+        defaultValue={state.values?.endDate ?? entry.endDate}
         error={state.errors?.endDate}
       />
       <AdminField
         label="Description"
         name="description"
-        defaultValue={entry.description}
+        defaultValue={state.values?.description ?? entry.description}
         error={state.errors?.description}
         textarea
         rows={3}
@@ -59,7 +69,7 @@ export function ExperienceEntryForm(props: Props) {
       <AdminField
         label="Highlights (one per line)"
         name="highlights"
-        defaultValue={entry.highlights.join("\n")}
+        defaultValue={state.values?.highlights ?? entry.highlights.join("\n")}
         error={state.errors?.highlights}
         textarea
         rows={4}

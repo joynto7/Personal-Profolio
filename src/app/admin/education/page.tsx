@@ -45,26 +45,37 @@ export default async function AdminEducationPage() {
             <div className="flex shrink-0 items-center gap-1">
               {index > 0 && (
                 <form action={moveEducationEntry.bind(null, entry.id, "up")}>
-                  <Button type="submit" variant="ghost" size="icon-sm" aria-label="Move up">
+                  <Button
+                    type="submit"
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-label={`Move ${entry.institution} up`}
+                  >
                     <ArrowUp className="size-4" />
                   </Button>
                 </form>
               )}
               {index < entries.length - 1 && (
                 <form action={moveEducationEntry.bind(null, entry.id, "down")}>
-                  <Button type="submit" variant="ghost" size="icon-sm" aria-label="Move down">
+                  <Button
+                    type="submit"
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-label={`Move ${entry.institution} down`}
+                  >
                     <ArrowDown className="size-4" />
                   </Button>
                 </form>
               )}
               <Button asChild variant="ghost" size="icon-sm">
-                <Link href={`/admin/education/${entry.id}`} aria-label="Edit">
+                <Link href={`/admin/education/${entry.id}`} aria-label={`Edit ${entry.institution}`}>
                   <Pencil className="size-4" />
                 </Link>
               </Button>
               <ConfirmDeleteForm
                 action={deleteEducationEntry.bind(null, entry.id)}
                 confirmMessage={`Delete this education entry (${entry.institution})?`}
+                entryLabel={entry.institution}
               />
             </div>
           </li>

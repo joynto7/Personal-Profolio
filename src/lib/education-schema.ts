@@ -13,6 +13,7 @@ export const educationEntrySchema = z.object({
     .transform((value) => (value === "" ? null : value)),
   achievements: z
     .string()
+    .max(5000)
     .transform((value) =>
       value
         .split("\n")
