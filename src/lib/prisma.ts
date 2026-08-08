@@ -26,3 +26,11 @@ export const getProjectBySlug = cache((slug: string) =>
 export const getCaseStudyBySlug = cache((slug: string) =>
   prisma.caseStudy.findUnique({ where: { slug } })
 );
+
+/**
+ * Socials are read by both the root layout (Navbar/Footer) and the homepage (Hero).
+ * `cache` collapses those into a single query per request.
+ */
+export const getSocials = cache(() =>
+  prisma.social.findMany({ orderBy: { order: "asc" } })
+);

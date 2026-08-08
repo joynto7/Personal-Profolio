@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
-import { getProfile, prisma } from "@/lib/prisma";
+import { getProfile, getSocials } from "@/lib/prisma";
 import "./globals.css";
 
 // Every page reads live content from Postgres — nothing here may be prerendered.
@@ -55,10 +55,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [profile, socials] = await Promise.all([
-    getProfile(),
-    prisma.social.findMany({ orderBy: { order: "asc" } }),
-  ]);
+  const [profile, socials] = await Promise.all([getProfile(), getSocials()]);
 
   return (
     <html

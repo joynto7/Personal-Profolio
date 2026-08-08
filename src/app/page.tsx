@@ -6,13 +6,13 @@ import { Experience } from "@/components/sections/experience";
 import { Projects } from "@/components/sections/projects";
 import { CaseStudies } from "@/components/sections/case-studies";
 import { Contact } from "@/components/sections/contact";
-import { getProfile, prisma } from "@/lib/prisma";
+import { getProfile, getSocials, prisma } from "@/lib/prisma";
 
 export default async function Home() {
   const [profile, socials, skillGroups, education, experience, projects, caseStudies] =
     await Promise.all([
       getProfile(),
-      prisma.social.findMany({ orderBy: { order: "asc" } }),
+      getSocials(),
       prisma.skillGroup.findMany({
         orderBy: { order: "asc" },
         include: { skills: { orderBy: { order: "asc" } } },
