@@ -1,16 +1,41 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Admin",
 };
 
 const sections = [
-  "Profile — name, designation, tagline, location, contact details, and the three bio paragraphs",
-  "Skills — skill groups and the entries inside them",
-  "Education — academic timeline entries",
-  "Experience — work timeline entries",
-  "Projects — the project grid, including screenshots",
-  "Case Studies — the long-form write-ups",
+  {
+    label: "Profile",
+    href: "/admin/profile",
+    description: "Name, designation, tagline, location, contact details, and the three bio paragraphs",
+  },
+  {
+    label: "Skills",
+    href: null,
+    description: "Skill groups and the entries inside them",
+  },
+  {
+    label: "Education",
+    href: null,
+    description: "Academic timeline entries",
+  },
+  {
+    label: "Experience",
+    href: null,
+    description: "Work timeline entries",
+  },
+  {
+    label: "Projects",
+    href: null,
+    description: "The project grid, including screenshots",
+  },
+  {
+    label: "Case Studies",
+    href: null,
+    description: "The long-form write-ups",
+  },
 ];
 
 export default function AdminPage() {
@@ -28,18 +53,24 @@ export default function AdminPage() {
 
       <section className="mt-12">
         <h2 className="font-heading text-xl font-medium text-foreground">Editable sections</h2>
-        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          The editing forms arrive in the next stage of this feature. They are listed here as
-          plain text because their routes do not exist yet.
-        </p>
         <ul className="mt-4 flex flex-col gap-3">
           {sections.map((section) => (
             <li
-              key={section}
+              key={section.label}
               className="flex gap-2.5 text-sm leading-relaxed text-muted-foreground"
             >
               <span className="mt-2 size-1.5 shrink-0 rounded-full bg-caramel" />
-              {section}
+              <span>
+                {section.href ? (
+                  <Link href={section.href} className="font-medium text-foreground hover:text-caramel">
+                    {section.label}
+                  </Link>
+                ) : (
+                  <span className="font-medium text-foreground">{section.label}</span>
+                )}
+                {" — "}
+                {section.description}
+              </span>
             </li>
           ))}
         </ul>
