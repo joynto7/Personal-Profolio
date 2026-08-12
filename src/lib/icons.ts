@@ -56,3 +56,8 @@ export const ICONS: Record<string, IconType> = {
   "social-github": FaGithub,
   "social-linkedin": FaLinkedin,
 };
+
+/**
+ * Skill-selectable subset of ICONS — excludes the social-* keys, which exist only for the Social model.
+ */
+export const SKILL_ICON_KEYS = Object.keys(ICONS).filter((key) => !key.startsWith("social-"));
