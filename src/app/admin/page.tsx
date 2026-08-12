@@ -28,7 +28,7 @@ const sections = [
   },
   {
     label: "Projects",
-    href: null,
+    href: "/admin/projects",
     description: "The project grid, including screenshots",
   },
   {
