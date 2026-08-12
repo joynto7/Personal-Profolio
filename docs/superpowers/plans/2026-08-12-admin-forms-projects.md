@@ -20,7 +20,7 @@
 - Every toast-firing `useEffect` depends on `[state]` (the whole object), never individual fields.
 - `moveProject`'s neighbor lookup is a flat top-level list — no `groupId`-style scoping (there's nothing to scope by; every project is a peer of every other).
 - `[id]` route guards against a non-integer segment with `Number.isInteger`, calling `notFound()` — same pattern as Education/Experience.
-- No blob cleanup (deleting the old image file from Blob storage when a project's image is replaced or the project itself is deleted) in this plan — explicitly deferred. Orphaned blob files accumulate but this is a personal portfolio with a handful of projects; not worth the extra code this pass.
+- No blob cleanup (deleting the old image file from Blob storage when a project's image is replaced or the project itself is deleted) in this plan — explicitly deferred. Orphaned blob files accumulate but this is a personal portfolio with a handful of projects; not worth the extra code this pass. A third source of orphaned blobs: if `createProject` uploads an image successfully but the subsequent database write fails (e.g. a duplicate slug caught by `P2002`), that uploaded blob is orphaned too — same deferred-cleanup reasoning applies.
 - No URL-format validation on `liveUrl`/`githubUrl` — matches the existing convention in `profile-schema.ts` (`avatarUrl`/`resumeUrl` are also just length-capped strings, no format check).
 - Every newline-separated array field (`techStack`, `challenges`, `futureImprovements`) gets a `.max(2000)` character cap on the raw string before the split/trim/filter transform — built in from the start (a prior plan's final review had to retrofit this for `achievements`/`highlights`).
 
