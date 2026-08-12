@@ -330,12 +330,78 @@ git commit -m "Add Skills server actions: group and skill create/update/delete/m
 
 **Files:**
 - Create: `src/app/admin/skills/skill-row.tsx`
+- Modify: `src/components/admin/admin-field.tsx`
 
 **Interfaces:**
 - Consumes: `updateSkill`, `deleteSkill`, `moveSkill`, `SkillFormState` from Task 2; `AdminField` from `@/components/admin/admin-field`; `ConfirmDeleteForm` from `@/components/admin/confirm-delete-form` (takes `action`, `confirmMessage`, `entryLabel` — already shipped in Plan 2b).
-- Produces: `<SkillRow skill isFirst isLast />` — consumed by Task 5.
+- Produces: `<SkillRow skill isFirst isLast />` — consumed by Task 5. Also produces `AdminField`'s new optional `id` prop, consumed by Tasks 4 and 5.
 
-- [ ] **Step 1: Create `src/app/admin/skills/skill-row.tsx`**
+**Why `admin-field.tsx` changes here:** `AdminField` currently hardcodes `id={name}` / `htmlFor={name}` / the error paragraph's `id={`${name}-error`}`. Every prior consumer (Profile, Education, Experience) only ever renders one instance of a given field name per page, so this was never a problem. Skills is different: this page renders one `AdminField` per skill per group, so multiple rows render `<AdminField name="name" />` and `<AdminField name="color" />` simultaneously — without a fix, every row after the first gets a duplicate `id`, breaking label-click association and screen-reader `aria-describedby` linkage for every row but the first. Add an optional `id` prop that defaults to `name` (so every existing call site — Profile, Education, Experience — is completely unaffected), and use it everywhere `AdminField` currently uses `name` for DOM ids.
+
+- [ ] **Step 1: Modify `src/components/admin/admin-field.tsx`**
+
+```tsx
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+
+type AdminFieldProps = {
+  label: string;
+  name: string;
+  defaultValue: string;
+  error?: string;
+  type?: string;
+  textarea?: boolean;
+  rows?: number;
+  id?: string;
+};
+
+export function AdminField({
+  label,
+  name,
+  defaultValue,
+  error,
+  type = "text",
+  textarea = false,
+  rows = 3,
+  id,
+}: AdminFieldProps) {
+  const fieldId = id ?? name;
+
+  return (
+    <div>
+      <label htmlFor={fieldId} className="mb-1.5 block text-sm font-medium text-foreground">
+        {label}
+      </label>
+      {textarea ? (
+        <Textarea
+          id={fieldId}
+          name={name}
+          defaultValue={defaultValue}
+          rows={rows}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${fieldId}-error` : undefined}
+        />
+      ) : (
+        <Input
+          id={fieldId}
+          name={name}
+          type={type}
+          defaultValue={defaultValue}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${fieldId}-error` : undefined}
+        />
+      )}
+      {error && (
+        <p id={`${fieldId}-error`} className="mt-1.5 text-xs text-destructive">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+```
+
+- [ ] **Step 2: Create `src/app/admin/skills/skill-row.tsx`**
 
 ```tsx
 "use client";
@@ -376,6 +442,7 @@ export function SkillRow({ skill, isFirst, isLast }: Props) {
         <AdminField
           label="Name"
           name="name"
+          id={`name-${skill.id}`}
           defaultValue={state.values?.name ?? skill.name}
           error={state.errors?.name}
         />
@@ -405,6 +472,7 @@ export function SkillRow({ skill, isFirst, isLast }: Props) {
         <AdminField
           label="Color"
           name="color"
+          id={`color-${skill.id}`}
           defaultValue={state.values?.color ?? skill.color}
           error={state.errors?.color}
         />
@@ -454,16 +522,16 @@ export function SkillRow({ skill, isFirst, isLast }: Props) {
 }
 ```
 
-- [ ] **Step 2: Verify**
+- [ ] **Step 3: Verify**
 
 Run: `npx tsc --noEmit`
 Expected: no output, exit code 0.
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 4: Commit**
 
 ```bash
-git add src/app/admin/skills/skill-row.tsx
-git commit -m "Add SkillRow component for the Skills admin page"
+git add src/components/admin/admin-field.tsx src/app/admin/skills/skill-row.tsx
+git commit -m "Add optional id prop to AdminField and SkillRow component for the Skills admin page"
 ```
 
 ---
@@ -474,7 +542,7 @@ git commit -m "Add SkillRow component for the Skills admin page"
 - Create: `src/app/admin/skills/add-skill-form.tsx`
 
 **Interfaces:**
-- Consumes: `createSkill`, `SkillFormState` from Task 2.
+- Consumes: `createSkill`, `SkillFormState` from Task 2; `AdminField`'s `id` prop from Task 3 (needed here too — one `AddSkillForm` renders per group, so without a unique `id` its `name`/`color` fields collide across groups the same way `SkillRow`'s did within a group).
 - Produces: `<AddSkillForm groupId />` — consumed by Task 5.
 
 - [ ] **Step 1: Create `src/app/admin/skills/add-skill-form.tsx`**
@@ -517,6 +585,7 @@ export function AddSkillForm({ groupId }: { groupId: number }) {
       <AdminField
         label="Name"
         name="name"
+        id={`new-name-${groupId}`}
         defaultValue={state.values?.name ?? ""}
         error={state.errors?.name}
       />
@@ -549,6 +618,7 @@ export function AddSkillForm({ groupId }: { groupId: number }) {
       <AdminField
         label="Color"
         name="color"
+        id={`new-color-${groupId}`}
         defaultValue={state.values?.color ?? "#000000"}
         error={state.errors?.color}
       />
@@ -596,7 +666,7 @@ git commit -m "Add AddSkillForm component for the Skills admin page"
 - Create: `src/app/admin/skills/group-row.tsx`
 
 **Interfaces:**
-- Consumes: `updateSkillGroup`, `deleteSkillGroup`, `moveSkillGroup`, `SkillGroupFormState` from Task 2; `SkillRow` from Task 3; `AddSkillForm` from Task 4; `ConfirmDeleteForm`.
+- Consumes: `updateSkillGroup`, `deleteSkillGroup`, `moveSkillGroup`, `SkillGroupFormState` from Task 2; `SkillRow` from Task 3 (also its `AdminField`'s `id` prop — one `GroupRow` renders per group, so its "Category" field needs a unique `id` the same way); `AddSkillForm` from Task 4; `ConfirmDeleteForm`.
 - Produces: `<GroupRow group isFirst isLast />`, `type GroupWithSkills` — consumed by Task 7.
 
 - [ ] **Step 1: Create `src/app/admin/skills/group-row.tsx`**
@@ -641,6 +711,7 @@ export function GroupRow({ group, isFirst, isLast }: Props) {
             <AdminField
               label="Category"
               name="category"
+              id={`category-${group.id}`}
               defaultValue={state.values?.category ?? group.category}
               error={state.errors?.category}
             />
