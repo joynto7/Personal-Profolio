@@ -76,6 +76,8 @@ export function ProjectEntryForm(props: Props) {
           type="file"
           accept="image/*"
           required={props.mode === "create"}
+          aria-invalid={!!state.errors?.imageFile}
+          aria-describedby={state.errors?.imageFile ? "imageFile-error" : undefined}
           className="block w-full text-sm text-muted-foreground file:mr-3 file:rounded-lg file:border-0 file:bg-secondary file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-secondary-foreground"
         />
         {props.mode === "edit" && (
@@ -83,8 +85,13 @@ export function ProjectEntryForm(props: Props) {
             Leave blank to keep the current image.
           </p>
         )}
+        <p className="mt-1 text-xs text-muted-foreground">
+          Images larger than 8MB will fail to upload.
+        </p>
         {state.errors?.imageFile && (
-          <p className="mt-1.5 text-xs text-destructive">{state.errors.imageFile}</p>
+          <p id="imageFile-error" className="mt-1.5 text-xs text-destructive">
+            {state.errors.imageFile}
+          </p>
         )}
       </div>
 

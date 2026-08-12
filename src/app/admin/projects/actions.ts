@@ -117,6 +117,7 @@ export async function updateProject(
   }
 
   revalidatePath("/admin/projects");
+  revalidatePath(`/admin/projects/${id}`);
   revalidatePath("/");
   return { success: true };
 }
