@@ -5,14 +5,14 @@ import { toast } from "sonner";
 import { Loader2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AdminField } from "@/components/admin/admin-field";
-import { ICONS } from "@/lib/icons";
+import { SKILL_ICON_KEYS } from "@/lib/icons";
 import { createSkill, type SkillFormState } from "./actions";
 
 const initialState: SkillFormState = {};
-const iconOptions = Object.keys(ICONS).filter((key) => !key.startsWith("social-"));
+const iconOptions = SKILL_ICON_KEYS;
 
 const selectClassName =
-  "h-8 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30";
+  "h-8 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm dark:bg-input/30";
 
 export function AddSkillForm({ groupId }: { groupId: number }) {
   const [state, formAction, pending] = useActionState(createSkill.bind(null, groupId), initialState);
@@ -51,6 +51,8 @@ export function AddSkillForm({ groupId }: { groupId: number }) {
           name="iconKey"
           defaultValue={state.values?.iconKey ?? ""}
           className={selectClassName}
+          aria-invalid={!!state.errors?.iconKey}
+          aria-describedby={state.errors?.iconKey ? `new-iconKey-${groupId}-error` : undefined}
         >
           <option value="" disabled>
             Select an icon
@@ -62,7 +64,9 @@ export function AddSkillForm({ groupId }: { groupId: number }) {
           ))}
         </select>
         {state.errors?.iconKey && (
-          <p className="mt-1.5 text-xs text-destructive">{state.errors.iconKey}</p>
+          <p id={`new-iconKey-${groupId}-error`} className="mt-1.5 text-xs text-destructive">
+            {state.errors.iconKey}
+          </p>
         )}
       </div>
       <AdminField

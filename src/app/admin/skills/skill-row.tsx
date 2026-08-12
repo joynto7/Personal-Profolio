@@ -7,14 +7,14 @@ import { Button } from "@/components/ui/button";
 import { AdminField } from "@/components/admin/admin-field";
 import { ConfirmDeleteForm } from "@/components/admin/confirm-delete-form";
 import type { Skill } from "@prisma/client";
-import { ICONS } from "@/lib/icons";
+import { SKILL_ICON_KEYS } from "@/lib/icons";
 import { deleteSkill, moveSkill, updateSkill, type SkillFormState } from "./actions";
 
 const initialState: SkillFormState = {};
-const iconOptions = Object.keys(ICONS).filter((key) => !key.startsWith("social-"));
+const iconOptions = SKILL_ICON_KEYS;
 
 const selectClassName =
-  "h-8 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30";
+  "h-8 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm dark:bg-input/30";
 
 type Props = {
   skill: Skill;
@@ -52,6 +52,8 @@ export function SkillRow({ skill, isFirst, isLast }: Props) {
             name="iconKey"
             defaultValue={state.values?.iconKey ?? skill.iconKey}
             className={selectClassName}
+            aria-invalid={!!state.errors?.iconKey}
+            aria-describedby={state.errors?.iconKey ? `iconKey-${skill.id}-error` : undefined}
           >
             {iconOptions.map((key) => (
               <option key={key} value={key}>
@@ -60,7 +62,9 @@ export function SkillRow({ skill, isFirst, isLast }: Props) {
             ))}
           </select>
           {state.errors?.iconKey && (
-            <p className="mt-1.5 text-xs text-destructive">{state.errors.iconKey}</p>
+            <p id={`iconKey-${skill.id}-error`} className="mt-1.5 text-xs text-destructive">
+              {state.errors.iconKey}
+            </p>
           )}
         </div>
         <AdminField

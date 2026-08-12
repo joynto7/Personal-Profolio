@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import type { z } from "zod";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { skillGroupSchema } from "@/lib/skill-group-schema";
 import { skillSchema } from "@/lib/skill-schema";
@@ -55,6 +56,12 @@ export async function createSkillGroup(
       data: { ...parsed.data, order: (_max.order ?? -1) + 1 },
     });
   } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+      return {
+        errors: { category: "A group with this category already exists." },
+        values: raw as Record<string, string>,
+      };
+    }
     console.error("Failed to create skill group:", error);
     return { message: "Could not save. Please try again.", values: raw as Record<string, string> };
   }
@@ -79,6 +86,12 @@ export async function updateSkillGroup(
   try {
     await prisma.skillGroup.update({ where: { id }, data: parsed.data });
   } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+      return {
+        errors: { category: "A group with this category already exists." },
+        values: raw as Record<string, string>,
+      };
+    }
     console.error("Failed to update skill group:", error);
     return { message: "Could not save. Please try again.", values: raw as Record<string, string> };
   }
@@ -102,6 +115,7 @@ export async function deleteSkillGroup(id: number) {
 
 export async function moveSkillGroup(id: number, direction: "up" | "down") {
   try {
+    // ponytail: transient P2028 under rapid successive Neon requests surfaces as a 500; acceptable for a single-admin tool. Add a bounded retry if it shows up in real use.
     await prisma.$transaction(async (tx) => {
       const current = await tx.skillGroup.findUniqueOrThrow({ where: { id } });
       const neighbor = await tx.skillGroup.findFirst({
@@ -190,6 +204,7 @@ export async function deleteSkill(id: number) {
 
 export async function moveSkill(id: number, direction: "up" | "down") {
   try {
+    // ponytail: transient P2028 under rapid successive Neon requests surfaces as a 500; acceptable for a single-admin tool. Add a bounded retry if it shows up in real use.
     await prisma.$transaction(async (tx) => {
       const current = await tx.skill.findUniqueOrThrow({ where: { id } });
       const neighbor = await tx.skill.findFirst({

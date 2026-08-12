@@ -1,10 +1,7 @@
 import { z } from "zod";
-import { ICONS } from "@/lib/icons";
+import { SKILL_ICON_KEYS } from "@/lib/icons";
 
-const skillIconKeys = Object.keys(ICONS).filter((key) => !key.startsWith("social-")) as [
-  string,
-  ...string[],
-];
+const skillIconKeys = SKILL_ICON_KEYS as [string, ...string[]];
 
 export const skillSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(50),
