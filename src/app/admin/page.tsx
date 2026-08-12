@@ -13,7 +13,7 @@ const sections = [
   },
   {
     label: "Skills",
-    href: null,
+    href: "/admin/skills",
     description: "Skill groups and the entries inside them",
   },
   {
