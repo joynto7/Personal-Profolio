@@ -1,9 +1,9 @@
 import { z } from "zod";
 
-function jsonArrayField<T extends z.ZodTypeAny>(itemSchema: T) {
+function jsonArrayField<T extends z.ZodTypeAny>(itemSchema: T, maxLength = 10000) {
   return z
     .string()
-    .max(10000)
+    .max(maxLength, `Too long (max ${maxLength} characters) — trim or split into fewer entries.`)
     .transform((value, ctx) => {
       if (value.trim() === "") return [];
       try {
@@ -86,7 +86,16 @@ export const caseStudySchema = z.object({
     ),
   screenshots: jsonArrayField(
     z.object({
-      url: z.string().trim().min(1, "Screenshot url is required"),
+      url: z
+        .string()
+        .trim()
+        .min(1, "Screenshot url is required")
+        .refine(
+          (value) =>
+            value.startsWith("/") ||
+            /^https:\/\/[^/]+\.public\.blob\.vercel-storage\.com\//.test(value),
+          "Must be a local path starting with / or a Vercel Blob URL"
+        ),
       caption: z.string().trim(),
     })
   ),
@@ -95,7 +104,8 @@ export const caseStudySchema = z.object({
       title: z.string().trim().min(1, "Snippet title is required"),
       language: z.string().trim().min(1, "Snippet language is required"),
       code: z.string(),
-    })
+    }),
+    30000
   ),
 });
 

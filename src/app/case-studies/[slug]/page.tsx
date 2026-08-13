@@ -212,8 +212,8 @@ export default async function CaseStudyPage({ params }: Props) {
         <section className="mt-12">
           <h2 className="font-heading text-xl font-medium text-foreground">Screenshots</h2>
           <div className="mt-4 grid gap-6 sm:grid-cols-2">
-            {screenshots.map((shot) => (
-              <figure key={shot.url}>
+            {screenshots.map((shot, index) => (
+              <figure key={`${shot.url}-${index}`}>
                 <div className="relative aspect-video overflow-hidden rounded-xl border border-border">
                   <Image
                     src={shot.url}
@@ -236,8 +236,8 @@ export default async function CaseStudyPage({ params }: Props) {
         <section className="mt-12">
           <h2 className="font-heading text-xl font-medium text-foreground">Code Snippets</h2>
           <div className="mt-4 flex flex-col gap-6">
-            {codeSnippets.map((snippet) => (
-              <div key={snippet.title}>
+            {codeSnippets.map((snippet, index) => (
+              <div key={`${snippet.title}-${index}`}>
                 <p className="mb-2 text-sm font-medium text-foreground">
                   {snippet.title}{" "}
                   <span className="font-normal text-muted-foreground">

@@ -196,8 +196,8 @@ export function CaseStudyEntryForm(props: Props) {
           rows={6}
         />
         <p className="mt-1.5 text-xs text-muted-foreground">
-          Format: {`[{"url": "https://...", "caption": "..."}]`} — leave as{" "}
-          <code>[]</code> for none.
+          Format: {`[{"url": "/images/case-studies/example.png", "caption": "..."}]`} — url must
+          be a local /images/... path or a Vercel Blob URL. Leave as <code>[]</code> for none.
         </p>
       </div>
 
