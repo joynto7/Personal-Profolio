@@ -33,7 +33,7 @@ const sections = [
   },
   {
     label: "Case Studies",
-    href: null,
+    href: "/admin/case-studies",
     description: "The long-form write-ups",
   },
 ];
