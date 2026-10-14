@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { AIGuide } from "@/components/guide/ai-guide";
 import { getProfile, getSocials } from "@/lib/prisma";
 import "./globals.css";
 
@@ -70,6 +71,7 @@ export default async function RootLayout({
             <Navbar profile={profile} />
             {children}
             <Footer profile={profile} socials={socials} />
+            <AIGuide />
             <Toaster />
           </TooltipProvider>
         </ThemeProvider>

@@ -24,6 +24,13 @@ function detailsHref(project: Project) {
     : `/projects/${project.slug}`;
 }
 
+/** What Nova, the AI guide, says when the card is clicked: name, tagline, then the summary's first sentence. */
+function guideLine(project: Project, summary?: string | null) {
+  const firstSentence = summary?.trim().split(/(?<=[.!?])\s+/)[0];
+  const parts = [project.name, project.tagline, firstSentence].filter((part): part is string => Boolean(part));
+  return `${parts.map((part) => part.trim().replace(/[.!?]$/, "")).join(". ")}.`;
+}
+
 export function ProjectCard({
   project,
   index,
@@ -47,6 +54,7 @@ export function ProjectCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
+      data-guide={guideLine(project, summary)}
       className={cn(
         "group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-caramel/40 hover:shadow-lg",
         wide && "lg:col-span-2"
@@ -182,6 +190,7 @@ export function OtherProjectCard({ project, index }: { project: Project; index: 
     >
       <Link
         href={detailsHref(project)}
+        data-guide={guideLine(project)}
         className="flex h-full items-center gap-3 rounded-xl border border-border bg-background/60 p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-caramel/40 hover:shadow-lg"
       >
         <span className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-caramel/25 bg-caramel/10 text-caramel">
