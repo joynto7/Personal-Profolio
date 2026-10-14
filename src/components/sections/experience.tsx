@@ -1,19 +1,34 @@
 "use client";
 
+import { motion } from "framer-motion";
 import type { ExperienceEntry } from "@prisma/client";
-import { SectionHeader } from "@/components/scifi/section-header";
 import { TimelineItem } from "@/components/sections/timeline-item";
 
-export function Experience({ entries, number }: { entries: ExperienceEntry[]; number: number }) {
+export function Experience({ entries }: { entries: ExperienceEntry[] }) {
   return (
-    <section id="experience" className="scroll-mt-24 px-4 py-14 sm:px-6">
-      <div className="mx-auto max-w-7xl">
-        <SectionHeader number={number} title="Experience" subtitle="Where I've built real things with real teams." />
+    <section id="experience" className="scroll-mt-20 bg-background py-24">
+      <div className="mx-auto max-w-3xl px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.5 }}
+          className="text-center"
+        >
+          <span className="text-sm font-semibold tracking-widest text-caramel uppercase">
+            Experience
+          </span>
+          <h2 className="mt-3 font-heading text-3xl font-medium text-foreground sm:text-4xl">
+            Where I&apos;ve Worked
+          </h2>
+        </motion.div>
 
         {entries.length === 0 ? (
-          <p className="mt-10 text-center text-muted-foreground">Nothing to show here yet — check back soon.</p>
+          <p className="mt-14 text-center text-muted-foreground">
+            Nothing to show here yet — check back soon.
+          </p>
         ) : (
-          <div className="mx-auto mt-10 max-w-4xl">
+          <div className="mt-14">
             {entries.map((entry, i) => (
               <TimelineItem
                 key={entry.id}

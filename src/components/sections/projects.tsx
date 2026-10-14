@@ -1,119 +1,109 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import type { Project } from "@prisma/client";
+import { Button } from "@/components/ui/button";
 import { OtherProjectCard, ProjectCard } from "@/components/sections/project-card";
-import { SectionHeader } from "@/components/scifi/section-header";
-import { FEATURED_COUNT, KIND_LABELS, projectMeta, type ProjectKind } from "@/lib/project-icons";
-import { cn } from "@/lib/utils";
 
-const WIDE_QUERY = "(min-width: 1280px)";
-const subscribeWide = (onChange: () => void) => {
-  const query = window.matchMedia(WIDE_QUERY);
-  query.addEventListener("change", onChange);
-  return () => query.removeEventListener("change", onChange);
-};
+/** The first projects (in admin order) get a full card; the rest drop to the compact "Other Projects" row. */
+const FEATURED_COUNT = 4;
 
 export function Projects({
   projects,
   caseStudyOverviews,
   githubUrl,
-  number,
 }: {
   projects: Project[];
   /** Case study overview by slug — the card summary for projects that have no description of their own. */
   caseStudyOverviews: Record<string, string>;
   githubUrl?: string;
-  /** Section number for "Featured Work"; "Other Projects" takes the next one. */
-  number: number;
 }) {
-  const [filter, setFilter] = useState<ProjectKind | "all">("all");
-  // On the four-column layout the cards curve gently, like a wall of screens.
-  const wide = useSyncExternalStore(subscribeWide, () => window.matchMedia(WIDE_QUERY).matches, () => false);
-
   if (projects.length === 0) return null;
 
-  const all = projects.map((project, i) => ({ project, number: i + 1, meta: projectMeta(project.slug, i) }));
-  const kinds = (Object.keys(KIND_LABELS) as ProjectKind[]).filter((kind) => all.some((item) => item.meta.kind === kind));
-  const visible = (item: (typeof all)[number]) => filter === "all" || item.meta.kind === filter;
-  const featured = all.slice(0, FEATURED_COUNT).filter(visible);
-  const others = all.slice(FEATURED_COUNT).filter(visible);
-  const hasOthers = all.length > FEATURED_COUNT;
-  const repositories = githubUrl ? `${githubUrl.replace(/\/$/, "")}?tab=repositories` : undefined;
+  const featured = projects.slice(0, FEATURED_COUNT);
+  const others = projects.slice(FEATURED_COUNT);
 
   return (
-    <section id="projects" className="scroll-mt-24 px-4 py-14 sm:px-6">
-      <div className="mx-auto max-w-7xl">
-        <SectionHeader number={number} title="Featured Work" subtitle="Handpicked projects that showcase my skills and creativity.">
-          {kinds.length > 1 && (
-            <div role="group" aria-label="Filter projects" className="flex flex-wrap gap-1 rounded-full border border-caramel/25 bg-foreground/[0.03] p-1">
-              {(["all", ...kinds] as const).map((kind) => (
-                <button
-                  key={kind}
-                  type="button"
-                  aria-pressed={filter === kind}
-                  onClick={() => setFilter(kind)}
-                  className={cn(
-                    "rounded-full px-4 py-1.5 text-xs font-semibold transition",
-                    filter === kind
-                      ? "bg-linear-to-r from-cyan-500 to-blue-500 text-white shadow-[0_0_16px_-4px_rgba(34,211,238,0.9)]"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  {kind === "all" ? "All" : KIND_LABELS[kind]}
-                </button>
+    <section id="projects" className="relative scroll-mt-20 overflow-hidden bg-muted py-24">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-40 -right-40 size-[32rem] rounded-full bg-caramel/15 blur-3xl"
+      />
+
+      <div className="relative mx-auto max-w-6xl px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.5 }}
+          className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div className="max-w-2xl">
+            <span className="inline-flex items-center gap-3 text-sm font-semibold tracking-widest text-caramel uppercase">
+              Projects
+              <span aria-hidden className="h-0.5 w-8 rounded-full bg-caramel" />
+            </span>
+            <h2 className="mt-3 font-heading text-3xl font-medium text-foreground sm:text-4xl">
+              Featured{" "}
+              <span className="bg-linear-to-r from-mocha to-caramel bg-clip-text text-transparent dark:from-caramel dark:to-latte">
+                Work
+              </span>
+            </h2>
+            <p className="mt-4 text-muted-foreground">
+              A selection of projects that show how I think about product,
+              architecture, and the details in between.
+            </p>
+          </div>
+
+          {githubUrl && (
+            <Button size="lg" variant="outline" className="self-start px-4 sm:self-auto" asChild>
+              <a href={githubUrl} target="_blank" rel="noopener noreferrer">
+                More on GitHub
+                <ArrowRight className="size-4 transition-transform group-hover/button:translate-x-1" />
+              </a>
+            </Button>
+          )}
+        </motion.div>
+
+        <div className="mt-14 grid gap-6 lg:grid-cols-2">
+          {featured.map((project, i) => (
+            <ProjectCard
+              key={project.slug}
+              project={project}
+              index={i}
+              summary={
+                project.description ??
+                (project.caseStudySlug ? caseStudyOverviews[project.caseStudySlug] : null)
+              }
+              wide={featured.length % 2 === 1 && i === featured.length - 1}
+            />
+          ))}
+        </div>
+
+        {others.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.5 }}
+            className="mt-6 rounded-2xl border border-border bg-card/60 p-6"
+          >
+            <div className="border-l-2 border-caramel pl-3">
+              <h3 className="font-heading text-xl font-medium text-foreground">
+                Other Projects
+              </h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                More things I&apos;ve built along the way
+              </p>
+            </div>
+
+            <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              {others.map((project, i) => (
+                <OtherProjectCard key={project.slug} project={project} index={i} />
               ))}
             </div>
-          )}
-        </SectionHeader>
-
-        {featured.length > 0 ? (
-          <div className="mt-12 grid gap-x-6 gap-y-12 sm:grid-cols-2 xl:grid-cols-4">
-            {featured.map((item, i) => (
-              <ProjectCard
-                key={item.project.slug}
-                project={item.project}
-                index={i}
-                number={item.number}
-                meta={item.meta}
-                yaw={wide ? ((featured.length - 1) / 2 - i) * 6 : 0}
-                summary={
-                  item.project.description ??
-                  (item.project.caseStudySlug ? caseStudyOverviews[item.project.caseStudySlug] : null)
-                }
-              />
-            ))}
-          </div>
-        ) : (
-          <p className="mt-10 text-center text-sm text-muted-foreground">No featured projects in this category.</p>
-        )}
-
-        {hasOthers && (
-          <div className="mt-20">
-            <SectionHeader number={number + 1} title="Other Projects" subtitle="More projects I've worked on.">
-              {repositories && (
-                <a
-                  href={repositories}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group inline-flex items-center gap-1.5 text-sm font-semibold text-caramel"
-                >
-                  View all projects
-                  <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
-                </a>
-              )}
-            </SectionHeader>
-            {others.length > 0 ? (
-              <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                {others.map((item, i) => (
-                  <OtherProjectCard key={item.project.slug} project={item.project} index={i} meta={item.meta} />
-                ))}
-              </div>
-            ) : (
-              <p className="mt-8 text-center text-sm text-muted-foreground">No other projects in this category.</p>
-            )}
-          </div>
+          </motion.div>
         )}
       </div>
     </section>
