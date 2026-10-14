@@ -30,7 +30,13 @@ export default async function Home() {
       <Skills skillGroups={skillGroups} />
       <Education entries={education} />
       <Experience entries={experience} />
-      <Projects projects={projects} />
+      <Projects
+        projects={projects}
+        caseStudyOverviews={Object.fromEntries(
+          caseStudies.map((caseStudy) => [caseStudy.slug, caseStudy.overview])
+        )}
+        githubUrl={socials.find((social) => social.iconKey === "social-github")?.url}
+      />
       <CaseStudies caseStudies={caseStudies} />
       <Contact profile={profile} />
     </main>
