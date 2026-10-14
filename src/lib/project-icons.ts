@@ -4,6 +4,7 @@ import {
   CalendarDays,
   FolderGit2,
   Gavel,
+  Network,
   ShieldCheck,
   Sprout,
   Users,
@@ -52,9 +53,52 @@ export const PROJECT_ICONS: Record<string, LucideIcon> = {
   occasio: CalendarDays,
   surplusbid: Gavel,
   devpulse: Activity,
+  "network-traffic-analyzer": Network,
+  "network-analysis": Network,
 };
 
 export const DEFAULT_PROJECT_ICON = FolderGit2;
+
+/** The first projects (in admin order) get a full card; the rest become compact "Other Projects" modules. */
+export const FEATURED_COUNT = 4;
+
+export type ProjectKind = "web" | "tool" | "ai" | "api";
+
+export const KIND_LABELS: Record<ProjectKind, string> = {
+  web: "Web Apps",
+  tool: "Tools",
+  ai: "AI / Data",
+  api: "APIs",
+};
+
+/**
+ * Presentation details the database doesn't store, keyed by project slug: the category tag,
+ * which filter the project falls under, its accent color and team size. A project without
+ * an entry is a "Web App" with an accent picked from FALLBACK_ACCENTS by its position.
+ */
+const PROJECT_META: Record<string, { category: string; kind: ProjectKind; accent: string; team?: number }> = {
+  sentra: { category: "AI Security", kind: "ai", accent: "#22d3ee", team: 3 },
+  agrosync: { category: "IoT / AgriTech", kind: "web", accent: "#10b981" },
+  fixitnow: { category: "Marketplace", kind: "web", accent: "#8b5cf6" },
+  occasio: { category: "Events", kind: "web", accent: "#f97316" },
+  "club-connect": { category: "Campus", kind: "web", accent: "#14b8a6" },
+  surplusbid: { category: "Auctions", kind: "web", accent: "#6366f1" },
+  devpulse: { category: "Developer Tools", kind: "api", accent: "#3b82f6" },
+  "network-traffic-analyzer": { category: "Networking", kind: "tool", accent: "#a855f7" },
+  "network-analysis": { category: "Networking", kind: "tool", accent: "#a855f7" },
+};
+
+const FALLBACK_ACCENTS = ["#22d3ee", "#10b981", "#8b5cf6", "#f97316", "#3b82f6", "#d946ef"];
+
+export function projectMeta(slug: string, index: number) {
+  const meta = PROJECT_META[slug];
+  return {
+    category: meta?.category,
+    kind: meta?.kind ?? ("web" as ProjectKind),
+    accent: meta?.accent ?? FALLBACK_ACCENTS[index % FALLBACK_ACCENTS.length],
+    team: meta?.team,
+  };
+}
 
 export const TECH_ICONS: Record<string, IconType> = {
   nextjs: SiNextdotjs,

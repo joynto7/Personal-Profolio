@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { contactSchema } from "@/lib/contact-schema";
+import { HudPanel } from "@/components/scifi/hud-panel";
+import { SectionHeader } from "@/components/scifi/section-header";
 
 type FormState = {
   name: string;
@@ -18,7 +20,7 @@ type FormState = {
 
 const initialState: FormState = { name: "", email: "", message: "" };
 
-export function Contact({ profile }: { profile: Profile }) {
+export function Contact({ profile, number }: { profile: Profile; number: number }) {
   const [form, setForm] = useState<FormState>(initialState);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -79,30 +81,17 @@ export function Contact({ profile }: { profile: Profile }) {
   }
 
   return (
-    <section id="contact" className="scroll-mt-20 bg-background py-24">
-      <div className="mx-auto max-w-6xl px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.5 }}
-          className="mx-auto max-w-2xl text-center"
-        >
-          <span className="text-sm font-semibold tracking-widest text-caramel uppercase">
-            Contact
-          </span>
-          <h2 className="mt-3 font-heading text-3xl font-medium text-foreground sm:text-4xl">
-            Let&apos;s Work Together
-          </h2>
-          <p className="mt-4 text-muted-foreground">
-            Have a role, project, or just want to say hi? My inbox is always
-            open.
-          </p>
-        </motion.div>
+    <section id="contact" className="scroll-mt-24 px-4 py-14 sm:px-6">
+      <div className="mx-auto max-w-7xl">
+        <SectionHeader
+          number={number}
+          title="Let's Work Together"
+          subtitle="Have a role, a project, or just want to say hi? My inbox is always open."
+        />
 
-        <div className="mt-14 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
+        <div className="mt-10 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
           <motion.div
-            initial={{ opacity: 0, x: -16 }}
+            initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.5 }}
@@ -114,79 +103,75 @@ export function Contact({ profile }: { profile: Profile }) {
                 href={method.href}
                 target={method.label === "WhatsApp" ? "_blank" : undefined}
                 rel={method.label === "WhatsApp" ? "noopener noreferrer" : undefined}
-                className="flex items-center gap-4 rounded-xl border border-border bg-card p-5 transition-colors hover:border-caramel"
+                className="sf-glass group flex items-center gap-4 rounded-2xl p-5 transition duration-300 hover:-translate-y-0.5 hover:border-caramel"
               >
-                <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <span className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-caramel/40 bg-caramel/10 text-caramel shadow-[0_0_16px_-6px_var(--caramel)]">
                   <method.icon className="size-5" />
                 </span>
-                <span>
-                  <span className="block text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                    {method.label}
-                  </span>
-                  <span className="block text-sm font-medium text-foreground">
-                    {method.value}
-                  </span>
+                <span className="min-w-0">
+                  <span className="sf-label block text-muted-foreground">{method.label}</span>
+                  <span className="mt-0.5 block truncate text-sm font-medium text-foreground">{method.value}</span>
                 </span>
               </a>
             ))}
           </motion.div>
 
-          <motion.form
-            initial={{ opacity: 0, x: 16 }}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.5 }}
-            onSubmit={handleSubmit}
-            noValidate
-            className="flex flex-col gap-5 rounded-2xl border border-border bg-card p-8 shadow-sm"
           >
-            <div>
-              <Input
-                placeholder="Your name"
-                aria-label="Name"
-                value={form.name}
-                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-              />
-              {errors.name && (
-                <p className="mt-1.5 text-xs text-destructive">{errors.name}</p>
-              )}
-            </div>
+            <HudPanel cut={24} className="p-6 sm:p-8">
+              <p className="sf-label text-caramel">Transmission</p>
+              <form onSubmit={handleSubmit} noValidate className="mt-4 flex flex-col gap-5">
+                <div>
+                  <Input
+                    placeholder="Your name"
+                    aria-label="Name"
+                    value={form.name}
+                    onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                    className="h-11 bg-foreground/[0.03] focus-visible:shadow-[0_0_18px_-6px_var(--caramel)]"
+                  />
+                  {errors.name && <p className="mt-1.5 text-xs text-destructive">{errors.name}</p>}
+                </div>
 
-            <div>
-              <Input
-                type="email"
-                placeholder="you@example.com"
-                aria-label="Email"
-                value={form.email}
-                onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-              />
-              {errors.email && (
-                <p className="mt-1.5 text-xs text-destructive">{errors.email}</p>
-              )}
-            </div>
+                <div>
+                  <Input
+                    type="email"
+                    placeholder="you@example.com"
+                    aria-label="Email"
+                    value={form.email}
+                    onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                    className="h-11 bg-foreground/[0.03] focus-visible:shadow-[0_0_18px_-6px_var(--caramel)]"
+                  />
+                  {errors.email && <p className="mt-1.5 text-xs text-destructive">{errors.email}</p>}
+                </div>
 
-            <div>
-              <Textarea
-                placeholder="Tell me a bit about what you have in mind…"
-                aria-label="Message"
-                rows={5}
-                value={form.message}
-                onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
-              />
-              {errors.message && (
-                <p className="mt-1.5 text-xs text-destructive">{errors.message}</p>
-              )}
-            </div>
+                <div>
+                  <Textarea
+                    placeholder="Tell me a bit about what you have in mind…"
+                    aria-label="Message"
+                    rows={5}
+                    value={form.message}
+                    onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
+                    className="bg-foreground/[0.03] focus-visible:shadow-[0_0_18px_-6px_var(--caramel)]"
+                  />
+                  {errors.message && <p className="mt-1.5 text-xs text-destructive">{errors.message}</p>}
+                </div>
 
-            <Button type="submit" size="lg" disabled={submitting} className="self-start">
-              {submitting ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : (
-                <Send className="size-4" />
-              )}
-              {submitting ? "Sending..." : "Send Message"}
-            </Button>
-          </motion.form>
+                <Button
+                  type="submit"
+                  size="lg"
+                  disabled={submitting}
+                  className="h-11 self-start rounded-xl border-0 bg-linear-to-r from-cyan-500 via-blue-500 to-violet-500 px-5 font-semibold text-white shadow-[0_0_24px_-6px_rgba(34,211,238,0.85)] hover:brightness-110"
+                >
+                  {submitting ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
+                  {submitting ? "Sending..." : "Send Message"}
+                </Button>
+              </form>
+            </HudPanel>
+          </motion.div>
         </div>
       </div>
     </section>

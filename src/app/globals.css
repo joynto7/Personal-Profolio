@@ -59,89 +59,122 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/*
+ * Sci-fi palette. The old coffee token names (caramel, mocha, espresso…) are kept because
+ * the admin and detail pages use them; they now point at the space palette:
+ * caramel = the cyan signal color, mocha = ultraviolet, espresso = console black.
+ */
 :root {
-  /* Premium coffee + white palette */
-  --warm-white: #faf8f5;
-  --ivory: #f3eee8;
-  --espresso: #4a2f27;
-  --espresso-hover: #3a241e;
-  --mocha: #6f4e37;
-  --caramel: #c28a58;
-  --caramel-hover: #a96d3e;
-  --latte: #d7b899;
-  --beige: #e8ded5;
-  --charcoal: #1b1a18;
-  --warm-gray: #68625b;
-  --success: #2d6a4f;
+  /* "Lunar" — the light variant */
+  --warm-white: #f5f7fc;
+  --ivory: #e8edf8;
+  --espresso: #0b1226;
+  --espresso-hover: #111a36;
+  --mocha: #6d28d9;
+  --caramel: #0e7490;
+  --caramel-hover: #155e75;
+  --latte: #c7d2fe;
+  --beige: #d3dbef;
+  --charcoal: #0b1226;
+  --warm-gray: #4b5a75;
+  --success: #059669;
   --warning: #d97706;
 
-  --background: var(--warm-white);
-  --foreground: var(--charcoal);
+  --background: #eef2fb;
+  --foreground: #0b1226;
   --card: #ffffff;
-  --card-foreground: var(--charcoal);
+  --card-foreground: #0b1226;
   --popover: #ffffff;
-  --popover-foreground: var(--charcoal);
-  --primary: var(--espresso);
+  --popover-foreground: #0b1226;
+  --primary: #0e7490;
   --primary-foreground: #ffffff;
-  --secondary: var(--ivory);
-  --secondary-foreground: var(--espresso);
-  --muted: var(--ivory);
-  --muted-foreground: var(--warm-gray);
-  --accent: var(--caramel);
-  --accent-foreground: var(--charcoal);
-  --destructive: #b91c1c;
-  --border: var(--beige);
-  --input: var(--beige);
-  --ring: var(--caramel);
-  --chart-1: var(--espresso);
-  --chart-2: var(--mocha);
-  --chart-3: var(--caramel);
-  --chart-4: var(--latte);
-  --chart-5: var(--warm-gray);
+  --secondary: #e0e7ff;
+  --secondary-foreground: #1e1b4b;
+  --muted: #e4e9f5;
+  --muted-foreground: #4b5a75;
+  --accent: #7c3aed;
+  --accent-foreground: #ffffff;
+  --destructive: #dc2626;
+  --border: #cdd6ea;
+  --input: #cdd6ea;
+  --ring: #0891b2;
+  --chart-1: #0891b2;
+  --chart-2: #7c3aed;
+  --chart-3: #2563eb;
+  --chart-4: #c026d3;
+  --chart-5: #0d9488;
   --radius: 0.75rem;
-  --sidebar: var(--ivory);
-  --sidebar-foreground: var(--charcoal);
-  --sidebar-primary: var(--espresso);
+  --sidebar: #e4e9f5;
+  --sidebar-foreground: #0b1226;
+  --sidebar-primary: #0e7490;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: var(--latte);
-  --sidebar-accent-foreground: var(--charcoal);
-  --sidebar-border: var(--beige);
-  --sidebar-ring: var(--caramel);
+  --sidebar-accent: #e0e7ff;
+  --sidebar-accent-foreground: #0b1226;
+  --sidebar-border: #cdd6ea;
+  --sidebar-ring: #0891b2;
+
+  --sf-glass: rgba(255, 255, 255, 0.66);
+  --sf-glass-strong: rgba(255, 255, 255, 0.84);
+  --sf-edge-2: rgba(124, 58, 237, 0.4);
+  --sf-shadow: rgba(30, 41, 89, 0.22);
+  --sf-star: rgba(30, 58, 138, 0.35);
+  --sf-nebula: 0.45;
+  --sf-accent: var(--caramel);
 }
 
 .dark {
-  /* Premium coffee + white palette — dark variant */
-  --background: #1b1512;
-  --foreground: #f3eee8;
-  --card: #241d18;
-  --card-foreground: #f3eee8;
-  --popover: #241d18;
-  --popover-foreground: #f3eee8;
-  --primary: var(--caramel);
-  --primary-foreground: #1b1512;
-  --secondary: #2e251f;
-  --secondary-foreground: #f3eee8;
-  --muted: #2e251f;
-  --muted-foreground: #b8aa9e;
-  --accent: var(--caramel);
-  --accent-foreground: #1b1512;
-  --destructive: #e5584f;
-  --border: #3a2e27;
-  --input: #3a2e27;
-  --ring: var(--caramel);
-  --chart-1: var(--latte);
-  --chart-2: var(--caramel);
-  --chart-3: var(--mocha);
-  --chart-4: var(--warm-gray);
-  --chart-5: var(--espresso);
-  --sidebar: #241d18;
-  --sidebar-foreground: #f3eee8;
-  --sidebar-primary: var(--caramel);
-  --sidebar-primary-foreground: #1b1512;
-  --sidebar-accent: #2e251f;
-  --sidebar-accent-foreground: #f3eee8;
-  --sidebar-border: #3a2e27;
-  --sidebar-ring: var(--caramel);
+  /* "Deep Space" */
+  --warm-white: #e7eefa;
+  --ivory: #111a36;
+  --espresso: #050a1a;
+  --espresso-hover: #0a1228;
+  --mocha: #a78bfa;
+  --caramel: #22d3ee;
+  --caramel-hover: #67e8f9;
+  --latte: #312e81;
+  --beige: #1d2a4d;
+  --charcoal: #e7eefa;
+  --warm-gray: #93a1bd;
+
+  --background: #03050d;
+  --foreground: #e7eefa;
+  --card: #0a1228;
+  --card-foreground: #e7eefa;
+  --popover: #0b132b;
+  --popover-foreground: #e7eefa;
+  --primary: #22d3ee;
+  --primary-foreground: #031018;
+  --secondary: #111a36;
+  --secondary-foreground: #dbe4ff;
+  --muted: #0c1430;
+  --muted-foreground: #93a1bd;
+  --accent: #8b5cf6;
+  --accent-foreground: #f5f3ff;
+  --destructive: #f87171;
+  --border: #1d2a4d;
+  --input: #1d2a4d;
+  --ring: #22d3ee;
+  --chart-1: #22d3ee;
+  --chart-2: #a78bfa;
+  --chart-3: #60a5fa;
+  --chart-4: #e879f9;
+  --chart-5: #2dd4bf;
+  --sidebar: #0a1228;
+  --sidebar-foreground: #e7eefa;
+  --sidebar-primary: #22d3ee;
+  --sidebar-primary-foreground: #031018;
+  --sidebar-accent: #111a36;
+  --sidebar-accent-foreground: #e7eefa;
+  --sidebar-border: #1d2a4d;
+  --sidebar-ring: #22d3ee;
+
+  --sf-glass: rgba(9, 16, 38, 0.6);
+  --sf-glass-strong: rgba(7, 12, 30, 0.84);
+  --sf-edge-2: rgba(139, 92, 246, 0.55);
+  --sf-shadow: rgba(0, 0, 0, 0.65);
+  --sf-star: rgba(255, 255, 255, 0.9);
+  --sf-nebula: 1;
+  --sf-accent: var(--caramel);
 }
 
 @layer base {
@@ -154,6 +187,347 @@
   html {
     @apply font-sans;
   }
+  ::selection {
+    background: color-mix(in oklab, var(--caramel) 35%, transparent);
+  }
+}
+
+/* ---------------------------------------------------------------- space backdrop */
+
+.sf-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  overflow: hidden;
+  pointer-events: none;
+  background: radial-gradient(120% 80% at 50% 0%, color-mix(in oklab, var(--background) 70%, #0b1440), var(--background) 70%);
+}
+
+.sf-nebula {
+  position: absolute;
+  inset: -20%;
+  opacity: var(--sf-nebula);
+  background:
+    radial-gradient(38% 32% at 80% 14%, rgba(124, 58, 237, 0.34), transparent 70%),
+    radial-gradient(34% 30% at 12% 24%, rgba(14, 165, 233, 0.2), transparent 70%),
+    radial-gradient(40% 32% at 62% 78%, rgba(217, 70, 239, 0.12), transparent 70%),
+    radial-gradient(30% 24% at 28% 66%, rgba(20, 184, 166, 0.1), transparent 70%);
+  animation: sf-nebula 40s ease-in-out infinite alternate;
+}
+
+.sf-stars {
+  position: absolute;
+  inset: -40%;
+  background-image:
+    radial-gradient(1px 1px at 24px 36px, var(--sf-star) 50%, transparent 51%),
+    radial-gradient(1px 1px at 132px 84px, var(--sf-star) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 210px 160px, var(--sf-star) 50%, transparent 51%),
+    radial-gradient(1px 1px at 280px 40px, var(--sf-star) 50%, transparent 51%),
+    radial-gradient(1px 1px at 90px 220px, var(--sf-star) 50%, transparent 51%),
+    radial-gradient(1.2px 1.2px at 330px 260px, var(--sf-star) 50%, transparent 51%),
+    radial-gradient(1px 1px at 180px 300px, var(--sf-star) 50%, transparent 51%);
+  background-size: 360px 340px;
+  opacity: 0.55;
+  animation: sf-drift 160s linear infinite;
+}
+
+.sf-stars.far {
+  background-size: 210px 230px;
+  opacity: 0.3;
+  animation-duration: 260s;
+}
+
+.sf-grid {
+  position: absolute;
+  inset-inline: -10%;
+  bottom: -30%;
+  height: 70%;
+  opacity: calc(var(--sf-nebula) * 0.35);
+  background:
+    linear-gradient(transparent 0 calc(100% - 1px), rgba(56, 189, 248, 0.28) 0) 0 0 / 80px 80px,
+    linear-gradient(90deg, transparent 0 calc(100% - 1px), rgba(56, 189, 248, 0.28) 0) 0 0 / 80px 80px;
+  transform: perspective(600px) rotateX(64deg);
+  mask-image: linear-gradient(to top, #000 10%, transparent 75%);
+}
+
+/* ---------------------------------------------------------------- holographic panels */
+
+/* Chamfered HUD frame (see components/scifi/hud-panel.tsx): a gradient edge layer with a
+ * drop-shadow glow, and a 1px-inset glass fill clipped to the same shape. */
+.hud {
+  --cut: 18px;
+  position: relative;
+  isolation: isolate;
+}
+
+.hud-glow {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  filter: drop-shadow(0 0 12px color-mix(in oklab, var(--sf-accent) 50%, transparent));
+}
+
+.hud-edge,
+.hud-fill {
+  position: absolute;
+  clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+}
+
+.hud-edge {
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    var(--sf-accent),
+    color-mix(in oklab, var(--sf-accent) 35%, transparent) 28%,
+    color-mix(in oklab, var(--sf-accent) 18%, transparent) 70%,
+    var(--sf-edge-2)
+  );
+}
+
+.hud-fill {
+  inset: 1px;
+  z-index: -1;
+  clip-path: polygon(calc(var(--cut) - 0.4px) 0, 100% 0, 100% calc(100% - var(--cut) + 0.4px), calc(100% - var(--cut) + 0.4px) 100%, 0 100%, 0 calc(var(--cut) - 0.4px));
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--sf-accent) 9%, transparent), transparent 45%),
+    var(--sf-glass-strong);
+  backdrop-filter: blur(14px) saturate(1.2);
+}
+
+.hud-ticks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hud-ticks::before,
+.hud-ticks::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-color: var(--sf-accent);
+  opacity: 0.9;
+}
+
+.hud-ticks::before {
+  top: 7px;
+  right: 7px;
+  border-top: 2px solid;
+  border-right: 2px solid;
+}
+
+.hud-ticks::after {
+  bottom: 7px;
+  left: 7px;
+  border-bottom: 2px solid;
+  border-left: 2px solid;
+}
+
+/* Hexagonal-ended variant for long bars such as the navbar. */
+.hud.hex .hud-edge,
+.hud.hex .hud-fill {
+  clip-path: polygon(20px 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 20px 100%, 0 50%);
+}
+
+/* Rounded glass for smaller modules. */
+.sf-glass {
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--sf-accent) 10%, transparent), transparent 55%),
+    var(--sf-glass);
+  border: 1px solid color-mix(in oklab, var(--sf-accent) 40%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--sf-accent) 8%, transparent) inset,
+    0 18px 40px -22px var(--sf-shadow),
+    0 0 26px -12px color-mix(in oklab, var(--sf-accent) 60%, transparent);
+  backdrop-filter: blur(12px) saturate(1.15);
+}
+
+/* Featured project card: a glass module with an accent-lit frame. */
+.holo-card {
+  background:
+    radial-gradient(120% 55% at 50% 0%, color-mix(in oklab, var(--sf-accent) 20%, transparent), transparent 62%),
+    linear-gradient(180deg, var(--sf-glass), var(--sf-glass-strong));
+  border: 1px solid color-mix(in oklab, var(--sf-accent) 55%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--sf-accent) 14%, transparent) inset,
+    0 1px 0 0 color-mix(in oklab, var(--sf-accent) 60%, white) inset,
+    0 0 34px -10px color-mix(in oklab, var(--sf-accent) 70%, transparent),
+    0 40px 70px -32px var(--sf-shadow);
+  backdrop-filter: blur(14px) saturate(1.2);
+  transition: box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+.holo-card:hover {
+  border-color: var(--sf-accent);
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--sf-accent) 25%, transparent) inset,
+    0 1px 0 0 color-mix(in oklab, var(--sf-accent) 70%, white) inset,
+    0 0 48px -6px color-mix(in oklab, var(--sf-accent) 80%, transparent),
+    0 40px 70px -30px var(--sf-shadow);
+}
+
+/* Spotlight that follows the pointer (Tilt sets --mx/--my). */
+.holo-spot {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background: radial-gradient(320px circle at var(--mx, 50%) var(--my, 0%), color-mix(in oklab, var(--sf-accent) 24%, transparent), transparent 60%);
+}
+
+.holo-card:hover .holo-spot {
+  opacity: 1;
+}
+
+.holo-scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 3px);
+  mix-blend-mode: overlay;
+}
+
+/* The lit platform each featured card stands on. */
+.holo-pedestal {
+  position: relative;
+  height: 38px;
+  margin: -10px 10% 0;
+  pointer-events: none;
+}
+
+.holo-pedestal::before {
+  content: "";
+  position: absolute;
+  inset: 4px 4% 14px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in oklab, var(--sf-accent) 75%, transparent);
+  background: radial-gradient(50% 50% at 50% 50%, color-mix(in oklab, var(--sf-accent) 50%, transparent), transparent 72%);
+  box-shadow: 0 0 26px -2px color-mix(in oklab, var(--sf-accent) 75%, transparent);
+  animation: sf-pulse 4s ease-in-out infinite;
+}
+
+.holo-pedestal::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 14px;
+  clip-path: polygon(7% 0, 93% 0, 100% 100%, 0 100%);
+  background: linear-gradient(180deg, color-mix(in oklab, var(--sf-accent) 40%, #26304f), #0b1022);
+}
+
+/* Circular stage under the tech stack consoles. */
+.tech-stage {
+  position: absolute;
+  inset: auto 4% -46px;
+  height: 150px;
+  pointer-events: none;
+}
+
+.tech-stage span {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid color-mix(in oklab, var(--caramel) 50%, transparent);
+  box-shadow: 0 0 30px -6px var(--caramel), inset 0 0 40px -10px var(--caramel);
+}
+
+.tech-stage span:nth-child(2) {
+  inset: 18% 14%;
+  border-style: dashed;
+  border-color: color-mix(in oklab, var(--mocha) 60%, transparent);
+  box-shadow: none;
+}
+
+.tech-stage span:nth-child(3) {
+  inset: 34% 30%;
+  background: radial-gradient(50% 50% at 50% 50%, color-mix(in oklab, var(--caramel) 55%, transparent), transparent 70%);
+  border-color: color-mix(in oklab, var(--caramel) 70%, transparent);
+}
+
+/* A band of light that sweeps across its parent now and then. */
+.sf-sweep {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.sf-sweep::after {
+  content: "";
+  position: absolute;
+  inset: -10% auto -10% 0;
+  width: 35%;
+  background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--sf-accent, #fff) 22%, transparent), transparent);
+  transform: translateX(-120%) skewX(-18deg);
+  animation: sf-sweep 9s ease-in-out infinite;
+  animation-delay: var(--sweep-delay, 0s);
+}
+
+.sf-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.sf-gradient-text {
+  background: linear-gradient(90deg, #22d3ee, #60a5fa 45%, #a78bfa);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+:root:not(.dark) .sf-gradient-text {
+  background-image: linear-gradient(90deg, #0891b2, #2563eb 45%, #7c3aed);
+}
+
+/* Feathers the hero's 3D canvas into the page on every side, so nothing ends on a hard edge. */
+.hero-scene-mask {
+  mask-image:
+    linear-gradient(to right, transparent, #000 8%, #000 92%, transparent),
+    linear-gradient(to bottom, transparent, #000 6%, #000 82%, transparent);
+  mask-composite: intersect;
+}
+
+/* ---------------------------------------------------------------- motion */
+
+@keyframes sf-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-360px, -170px, 0); }
+}
+
+@keyframes sf-nebula {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(-3%, 2%, 0) scale(1.08); }
+}
+
+@keyframes sf-sweep {
+  0% { transform: translateX(-120%) skewX(-18deg); }
+  55%, 100% { transform: translateX(320%) skewX(-18deg); }
+}
+
+@keyframes sf-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes sf-pulse {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
+@keyframes sf-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes sf-scroll {
+  0% { transform: translateY(0); opacity: 1; }
+  70% { transform: translateY(9px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 0; }
 }
 
 /* Nova, the AI guide (src/components/guide/ai-guide.tsx) */
@@ -165,4 +539,15 @@
 @keyframes guide-scan {
   from { transform: translateY(-100%); }
   to { transform: translateY(200%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
