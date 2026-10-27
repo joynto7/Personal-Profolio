@@ -462,7 +462,7 @@ const profileData = {
   location: "Dhaka, Bangladesh",
   avatarUrl: "/images/IMG_6159.jpeg",
   resumeUrl: "/CV.pdf",
-  email: "jg.contact.me07@gmail.com",
+  email: "joyntoghosh768@gmail.com",
   phone: "+880 1305 531529",
   whatsapp: "+880 1305 531529",
   bioJourney:

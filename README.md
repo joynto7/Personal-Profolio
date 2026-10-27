@@ -78,6 +78,6 @@ Hosted on [Vercel](https://joyntoghosh.vercel.app/). Environment variables (`RES
 
 ## Contact
 
-- **Email:** [jg.contact.me07@gmail.com](mailto:jg.contact.me07@gmail.com)
+- **Email:** [joyntoghosh768@gmail.com](mailto:joyntoghosh768@gmail.com)
 - **GitHub:** [@joynto7](https://github.com/joynto7)
 - **LinkedIn:** [in/joynto7](https://www.linkedin.com/in/joynto7/)
