@@ -24,8 +24,6 @@ export function Footer({ profile, socials }: { profile: Profile; socials: Social
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  data-guide={link.guide}
-                  data-guide-sound="nav"
                   className="text-sm text-warm-white/80 transition-colors hover:text-caramel"
                 >
                   {link.label}

@@ -155,14 +155,3 @@
     @apply font-sans;
   }
 }
-
-/* Nova, the AI guide (src/components/guide/ai-guide.tsx) */
-@keyframes guide-wave {
-  0%, 100% { transform: scaleY(0.3); }
-  50% { transform: scaleY(1); }
-}
-
-@keyframes guide-scan {
-  from { transform: translateY(-100%); }
-  to { transform: translateY(200%); }
-}
