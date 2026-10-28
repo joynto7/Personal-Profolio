@@ -57,7 +57,7 @@ export function Projects({
           </div>
 
           {githubUrl && (
-            <Button size="lg" variant="outline" className="self-start px-4 sm:self-auto" asChild>
+            <Button size="lg" variant="outline" className="self-start px-4 sm:self-auto" data-robot="github" asChild>
               <a href={githubUrl} target="_blank" rel="noopener noreferrer">
                 More on GitHub
                 <ArrowRight className="size-4 transition-transform group-hover/button:translate-x-1" />

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { contactSchema } from "@/lib/contact-schema";
+import { signalRobot } from "@/lib/robot/bus";
 
 type FormState = {
   name: string;
@@ -70,9 +71,11 @@ export function Contact({ profile }: { profile: Profile }) {
       if (!res.ok) throw new Error("Request failed");
 
       toast.success("Message sent — I'll get back to you soon.");
+      signalRobot("success");
       setForm(initialState);
     } catch {
       toast.error("Something went wrong. Please try again or email me directly.");
+      signalRobot("error");
     } finally {
       setSubmitting(false);
     }
@@ -114,6 +117,7 @@ export function Contact({ profile }: { profile: Profile }) {
                 href={method.href}
                 target={method.label === "WhatsApp" ? "_blank" : undefined}
                 rel={method.label === "WhatsApp" ? "noopener noreferrer" : undefined}
+                data-robot="contact"
                 className="flex items-center gap-4 rounded-xl border border-border bg-card p-5 transition-colors hover:border-caramel"
               >
                 <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -178,7 +182,7 @@ export function Contact({ profile }: { profile: Profile }) {
               )}
             </div>
 
-            <Button type="submit" size="lg" disabled={submitting} className="self-start">
+            <Button type="submit" size="lg" disabled={submitting} className="self-start" data-robot="contact">
               {submitting ? (
                 <Loader2 className="size-4 animate-spin" />
               ) : (

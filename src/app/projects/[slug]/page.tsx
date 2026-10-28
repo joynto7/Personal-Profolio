@@ -35,6 +35,7 @@ export default async function ProjectPage({ params }: Props) {
     <main className="mx-auto max-w-4xl px-6 py-16">
       <Link
         href="/#projects"
+        data-robot="nav"
         className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
       >
         <ArrowLeft className="size-4" />
@@ -72,7 +73,7 @@ export default async function ProjectPage({ params }: Props) {
       {(project.liveUrl || project.githubUrl) && (
         <div className="mt-6 flex flex-wrap gap-3">
           {project.liveUrl && (
-            <Button asChild>
+            <Button data-robot="live" asChild>
               <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="size-4" />
                 Live Project
@@ -80,7 +81,7 @@ export default async function ProjectPage({ params }: Props) {
             </Button>
           )}
           {project.githubUrl && (
-            <Button variant="outline" asChild>
+            <Button variant="outline" data-robot="github" asChild>
               <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
                 <FaGithub className="size-4" />
                 GitHub Repo

@@ -47,6 +47,7 @@ export function ProjectCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
+      data-robot="card"
       className={cn(
         "group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-caramel/40 hover:shadow-lg",
         wide && "lg:col-span-2"
@@ -133,7 +134,7 @@ export function ProjectCard({
 
       <div className="relative mt-auto flex flex-wrap gap-3 pt-6">
         {project.liveUrl && (
-          <Button size="lg" className="px-4" asChild>
+          <Button size="lg" className="px-4" data-robot="live" asChild>
             <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">
               <ExternalLink className="size-4" />
               Live demo
@@ -145,6 +146,7 @@ export function ProjectCard({
             size="lg"
             variant={project.liveUrl ? "outline" : "default"}
             className="px-4"
+            data-robot="github"
             asChild
           >
             <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
@@ -157,6 +159,7 @@ export function ProjectCard({
           size="lg"
           variant={project.liveUrl || project.githubUrl ? "outline" : "default"}
           className="px-4"
+          data-robot="details"
           asChild
         >
           <Link href={href}>
@@ -182,6 +185,7 @@ export function OtherProjectCard({ project, index }: { project: Project; index: 
     >
       <Link
         href={detailsHref(project)}
+        data-robot="details"
         className="flex h-full items-center gap-3 rounded-xl border border-border bg-background/60 p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-caramel/40 hover:shadow-lg"
       >
         <span className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-caramel/25 bg-caramel/10 text-caramel">

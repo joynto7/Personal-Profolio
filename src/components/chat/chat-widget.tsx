@@ -23,8 +23,13 @@ import {
   type ChatStreamEvent,
 } from "@/lib/chat-schema";
 import { ChatMarkdown } from "@/components/chat/chat-markdown";
-import { Robot, type RobotMood } from "@/components/chat/robot";
+import { Robot } from "@/components/chat/robot";
 import { RobotLauncher } from "@/components/chat/robot-launcher";
+import { RobotSoundControls } from "@/components/chat/robot-sound-controls";
+import type { RobotBase } from "@/lib/robot/brain";
+import { pulseRobotMouth, setRobotAnchor, setRobotBase, setRobotOpen, signalRobot } from "@/lib/robot/bus";
+import { getSoundPrefs, startThinkingTicks, unlockAudioOnGesture, useSoundPrefs } from "@/lib/robot/sound";
+import { readAloud, stopReading, unlockVoice, useVoiceSpeaking } from "@/lib/robot/voice";
 import { cn } from "@/lib/utils";
 
 /**
@@ -48,6 +53,18 @@ const MESSAGES_KEY = "portfolio-chat:messages";
 const TEASER_KEY = "portfolio-chat:teaser-seen";
 /** Matches Tailwind's `sm` breakpoint: below it the panel fills the screen. */
 const MOBILE_QUERY = "(max-width: 639px)";
+/** The robot's head, relative to the desktop panel (right-6 bottom-32, over the launcher), so the panel grows out of it. */
+const ROBOT_HEAD_ORIGIN = "calc(100% - 36px) calc(100% + 43px)";
+/** How long the visitor counts as typing after a keystroke, for the robot's listening face. */
+const TYPING_MS = 1500;
+
+function subscribeMobile(listener: () => void) {
+  const query = window.matchMedia(MOBILE_QUERY);
+  query.addEventListener("change", listener);
+  return () => query.removeEventListener("change", listener);
+}
+
+const isMobile = () => window.matchMedia(MOBILE_QUERY).matches;
 
 function copyFor(locale: ChatLocale, firstName: string, email: string) {
   if (locale === "bn") {
@@ -79,6 +96,12 @@ function copyFor(locale: ChatLocale, firstName: string, email: string) {
       truncated: "উত্তরটি মাঝপথে থেমে গেছে — বাকিটা জানতে \"আরও বলুন\" লিখুন।",
       stopped: "থামানো হয়েছে।",
       retry: "আবার চেষ্টা করুন",
+      sound: "শব্দের সেটিংস",
+      effects: "সাউন্ড ইফেক্ট",
+      volume: "ভলিউম",
+      voice: "উত্তর পড়ে শোনান",
+      voiceUnsupported: "এই ব্রাউজারে সমর্থিত নয়",
+      noVoice: "এই ডিভাইসে বাংলা ভয়েস নেই, তাই উত্তরটি পড়ে শোনানো যায়নি।",
       errors: {
         rate_limited: "খুব দ্রুত মেসেজ পাঠানো হচ্ছে — একটু অপেক্ষা করে আবার চেষ্টা করুন।",
         busy: "সহকারী এই মুহূর্তে ব্যস্ত — কিছুক্ষণ পর আবার চেষ্টা করুন।",
@@ -114,6 +137,12 @@ function copyFor(locale: ChatLocale, firstName: string, email: string) {
     truncated: "The answer was cut short — ask me to continue.",
     stopped: "Stopped.",
     retry: "Try again",
+    sound: "Sound settings",
+    effects: "Sound effects",
+    volume: "Volume",
+    voice: "Read answers aloud",
+    voiceUnsupported: "Not supported in this browser",
+    noVoice: "This device has no Bangla voice, so the answer wasn't read aloud.",
     errors: {
       rate_limited: "You're sending messages quickly — please wait a moment and try again.",
       busy: "The assistant is busy right now — please try again in a moment.",
@@ -220,12 +249,18 @@ export function ChatWidget({ name, email }: { name: string; email: string }) {
   const copy = copyFor(locale, firstName, email);
   const pathname = usePathname();
   const reduceMotion = useReducedMotion();
+  const fullScreen = useSyncExternalStore(subscribeMobile, isMobile, () => false);
+  const soundEffects = useSoundPrefs().effects;
+  const voiceSpeaking = useVoiceSpeaking();
 
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<UiMessage[]>([]);
   const [input, setInput] = useState("");
   const [pending, setPending] = useState(false);
   const [teaser, setTeaser] = useState(false);
+  const [inputFocused, setInputFocused] = useState(false);
+  const [typing, setTyping] = useState(false);
+  const [voiceNote, setVoiceNote] = useState(false);
 
   const restoredRef = useRef(false);
   const abortRef = useRef<AbortController | null>(null);
@@ -233,8 +268,45 @@ export function ChatWidget({ name, email }: { name: string; email: string }) {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const logRef = useRef<HTMLDivElement>(null);
   const followRef = useRef(true);
+  const typingTimerRef = useRef(0);
   const panelId = useId();
   const titleId = useId();
+
+  // The robot thinks while waiting for an answer, speaks while it streams or is read aloud,
+  // and listens while the visitor types. Errors and other reactions are gestures, played on top.
+  const last = messages.at(-1);
+  const listening = open && inputFocused && !pending && (typing || input.trim().length > 0);
+  const robotBase: RobotBase = pending
+    ? last?.content
+      ? "speaking"
+      : "thinking"
+    : voiceSpeaking
+      ? "speaking"
+      : listening
+        ? "listening"
+        : "idle";
+
+  useEffect(() => setRobotBase(robotBase), [robotBase]);
+  useEffect(() => setRobotOpen(open), [open]);
+  // While the visitor types, the robots look at what they're writing.
+  useEffect(() => setRobotAnchor(listening ? inputRef.current : null), [listening]);
+  useEffect(() => (robotBase === "thinking" ? startThinkingTicks() : undefined), [robotBase]);
+  // With sound on from an earlier visit, the first click or key press wakes the audio.
+  useEffect(() => (soundEffects ? unlockAudioOnGesture() : undefined), [soundEffects]);
+  // Reading aloud stops when the chat closes, on another page, and when the page goes away.
+  useEffect(() => {
+    if (!open) stopReading();
+  }, [open]);
+  useEffect(() => stopReading, [pathname]);
+  useEffect(() => {
+    window.addEventListener("pagehide", stopReading);
+    return () => window.removeEventListener("pagehide", stopReading);
+  }, []);
+  useEffect(() => {
+    if (!voiceNote) return;
+    const timer = window.setTimeout(() => setVoiceNote(false), 8000);
+    return () => window.clearTimeout(timer);
+  }, [voiceNote]);
 
   // A one-time nudge per session, so visitors notice the assistant exists.
   useEffect(() => {
@@ -344,6 +416,10 @@ export function ChatWidget({ name, email }: { name: string; email: string }) {
     requestAnimationFrame(resizeInput);
     setPending(true);
     followRef.current = true;
+    signalRobot("acknowledge");
+    // A new question cuts off the last answer being read; this click or key press also lets Safari speak.
+    stopReading();
+    if (getSoundPrefs().voice) unlockVoice();
 
     const controller = new AbortController();
     abortRef.current = controller;
@@ -353,6 +429,16 @@ export function ChatWidget({ name, email }: { name: string; email: string }) {
           message.id === replyId ? { ...message, ...(typeof change === "function" ? change(message) : change) } : message
         )
       );
+    const fail = (error: ChatErrorCode) => {
+      patch({ status: "error", error });
+      signalRobot("error");
+      stopReading();
+    };
+    let answer = "";
+    /** Reads the answer aloud as it arrives, if the visitor turned that on. */
+    const speak = (final: boolean) => {
+      if (getSoundPrefs().voice && !readAloud(replyId, answer, final)) setVoiceNote(true);
+    };
 
     try {
       const response = await fetch("/api/chat", {
@@ -363,7 +449,7 @@ export function ChatWidget({ name, email }: { name: string; email: string }) {
       });
       if (!response.ok || !response.body) {
         const data: { error?: unknown } | null = await response.json().catch(() => null);
-        patch({ status: "error", error: isErrorCode(data?.error) ? data.error : "unknown" });
+        fail(isErrorCode(data?.error) ? data.error : "unknown");
         return;
       }
 
@@ -380,18 +466,32 @@ export function ChatWidget({ name, email }: { name: string; email: string }) {
           if (!line.trim()) continue;
           const event = JSON.parse(line) as ChatStreamEvent;
           if (event.type === "text") {
+            answer += event.text;
             patch((message) => ({ content: message.content + event.text }));
+            pulseRobotMouth();
+            speak(false);
           } else {
             settled = true;
-            if (event.type === "done") patch({ status: "done", truncated: event.truncated });
-            else if (event.type === "refusal") patch({ status: "refused", content: "" });
-            else patch({ status: "error", error: event.error });
+            if (event.type === "done") {
+              patch({ status: "done", truncated: event.truncated });
+              speak(true);
+            } else if (event.type === "refusal") {
+              patch({ status: "refused", content: "" });
+              stopReading();
+            } else {
+              fail(event.error);
+            }
           }
         }
       }
-      if (!settled) patch({ status: "error", error: "unknown" });
+      if (!settled) fail("unknown");
     } catch {
-      patch(controller.signal.aborted ? { status: "stopped" } : { status: "error", error: "unknown" });
+      if (controller.signal.aborted) {
+        patch({ status: "stopped" });
+        stopReading();
+      } else {
+        fail("unknown");
+      }
     } finally {
       abortRef.current = null;
       setPending(false);
@@ -407,6 +507,7 @@ export function ChatWidget({ name, email }: { name: string; email: string }) {
 
   const startOver = () => {
     abortRef.current?.abort();
+    stopReading();
     restoredRef.current = true;
     setMessages([]);
     setInput("");
@@ -433,15 +534,24 @@ export function ChatWidget({ name, email }: { name: string; email: string }) {
   const onProjectPage = /^\/(case-studies|projects)\/[^/]+/.test(pathname);
   const suggestions = onProjectPage ? [copy.thisProject, ...copy.suggestions.slice(0, 3)] : copy.suggestions;
   const nearLimit = input.length > CHAT_LIMITS.userMessageChars * 0.8;
-  // The robot thinks while waiting for an answer, talks while it streams, and looks sad on an error.
-  const last = messages.at(-1);
-  const mood: RobotMood = pending
-    ? last?.content
-      ? "talking"
-      : "thinking"
-    : last?.status === "error"
-      ? "sad"
-      : "idle";
+  // On desktop the panel grows out of the robot's head and folds back into it; on phones it
+  // slides up over the page. Reduced motion only fades it.
+  const panelMotion = reduceMotion
+    ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: 0.2 } }
+    : fullScreen
+      ? {
+          initial: { opacity: 0, y: 32 },
+          animate: { opacity: 1, y: 0 },
+          exit: { opacity: 0, y: 32, transition: { duration: 0.2, ease: "easeIn" as const } },
+          transition: { type: "spring" as const, visualDuration: 0.3, bounce: 0.1 },
+        }
+      : {
+          initial: { opacity: 0, scale: 0.6, y: 24 },
+          animate: { opacity: 1, scale: 1, y: 0 },
+          exit: { opacity: 0, scale: 0.6, y: 24, transition: { duration: 0.2, ease: "easeIn" as const } },
+          transition: { type: "spring" as const, visualDuration: 0.35, bounce: 0.18 },
+          style: { transformOrigin: ROBOT_HEAD_ORIGIN },
+        };
 
   return (
     <div className="font-bilingual">
@@ -452,15 +562,12 @@ export function ChatWidget({ name, email }: { name: string; email: string }) {
             role="dialog"
             aria-labelledby={titleId}
             lang={locale}
-            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 16, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 16, scale: 0.98 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
+            {...panelMotion}
             className="fixed inset-0 z-[70] flex origin-bottom-right flex-col overflow-hidden bg-background text-foreground sm:inset-auto sm:right-6 sm:bottom-32 sm:h-[min(40rem,calc(100dvh-10rem))] sm:w-[25rem] sm:rounded-2xl sm:border sm:border-border sm:shadow-2xl"
           >
             <header className="flex items-center gap-3 bg-espresso px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 text-warm-white sm:pt-3">
               <span className="relative flex size-11 shrink-0 items-center justify-center rounded-full bg-warm-white/10 ring-1 ring-caramel/50">
-                <Robot variant="head" mood={mood} className="w-9" />
+                <Robot variant="head" className="w-9" />
                 <span aria-hidden className="absolute -right-0.5 -bottom-0.5 size-3 rounded-full bg-emerald-400 ring-2 ring-espresso" />
               </span>
               <div className="min-w-0 flex-1">
@@ -490,6 +597,7 @@ export function ChatWidget({ name, email }: { name: string; email: string }) {
                 </div>
               </div>
               <div className="flex shrink-0 items-center gap-1">
+                <RobotSoundControls copy={copy} />
                 <button
                   type="button"
                   onClick={startOver}
@@ -605,7 +713,12 @@ export function ChatWidget({ name, email }: { name: string; email: string }) {
                   onChange={(event) => {
                     setInput(event.target.value);
                     resizeInput();
+                    setTyping(true);
+                    window.clearTimeout(typingTimerRef.current);
+                    typingTimerRef.current = window.setTimeout(() => setTyping(false), TYPING_MS);
                   }}
+                  onFocus={() => setInputFocused(true)}
+                  onBlur={() => setInputFocused(false)}
                   onKeyDown={onInputKeyDown}
                   placeholder={copy.placeholder}
                   aria-label={copy.inputLabel}
@@ -617,6 +730,7 @@ export function ChatWidget({ name, email }: { name: string; email: string }) {
                     type="button"
                     onClick={() => {
                       abortRef.current?.abort();
+                      stopReading();
                       inputRef.current?.focus();
                     }}
                     aria-label={copy.stop}
@@ -638,7 +752,11 @@ export function ChatWidget({ name, email }: { name: string; email: string }) {
                 )}
               </div>
               <p className="mt-2 px-1 text-center text-[11px] leading-snug text-muted-foreground">
-                {nearLimit ? `${input.length} / ${CHAT_LIMITS.userMessageChars}` : copy.disclaimer}
+                {voiceNote
+                  ? copy.noVoice
+                  : nearLimit
+                    ? `${input.length} / ${CHAT_LIMITS.userMessageChars}`
+                    : copy.disclaimer}
               </p>
             </form>
           </motion.div>
@@ -647,7 +765,6 @@ export function ChatWidget({ name, email }: { name: string; email: string }) {
 
       <RobotLauncher
         open={open}
-        mood={mood}
         label={open ? copy.close : copy.open}
         panelId={panelId}
         hint={copy.launcher}

@@ -74,7 +74,10 @@ Open [http://localhost:3000](http://localhost:3000).
 
 The robot in the bottom-right corner opens an assistant that answers visitors' questions about me — background, skills, education, experience, projects, case studies, and how to get in touch.
 
-- **A robot with personality** — drawn in SVG and animated with Framer Motion (`src/components/chat/robot.tsx`): its eyes and head follow the cursor anywhere on the page, it blinks, and it thinks while an answer loads, talks while it streams, and looks sad on an error. On desktop it now and then strolls along the bottom of the screen and back, and hovering makes it smile, wave and say hello. It stays put on phones and for visitors who prefer reduced motion.
+- **A robot with personality** — drawn in SVG and animated with Framer Motion (`src/components/chat/robot.tsx`), with depth built from layers: as it turns, its face plate slides further than its shell, its ears slide the other way and its highlights stay put, while the whole figure tilts a few degrees in 3D. Its eyes lead and its head and body follow the cursor. As the cursor comes near it turns curious and its "Ask my AI assistant" invitation peeks out; on hover it waves.
+- **Aware of the page** — it looks at buttons and links as they're hovered or focused (anything marked `data-robot="…"`): it nods at the resume, waves at contact links, flashes its antenna at GitHub. It only watches, so every click still goes straight through. Its states live in a small, tested state machine (`src/lib/robot/brain.ts`).
+- **Expressive** — in the chat it listens while you type, thinks while an answer loads and speaks while it streams. A failed request gets a brief, restrained error face, and the contact form's real success gets a happy one. On desktop, after 20 seconds of no activity it takes a short stroll, walking back the moment the visitor returns. It stays docked on phones, and for visitors who prefer reduced motion it keeps still apart from its eyes and face.
+- **Sound and voice, both opt-in** — the speaker button in the chat header turns on short synthesized sound effects (Web Audio, no audio files) with a volume slider, and can read answers aloud with the browser's own speech, a sentence at a time. Both start off and are remembered. Bangla is read aloud only where the device has a Bangla voice.
 
 - **Bilingual** — it replies in the language of the question: English, Bangla, or Bangla typed in English letters (answered in Bangla script). The English / বাংলা switch in the chat header changes the interface and the default for messages with no clear language.
 - **Grounded in the site** — each request carries everything the site shows (profile, skills, education, experience, projects, case studies, socials), read from the same content as the pages, plus extra CV details from `src/data/chatbot.ts`. It's told to answer only from that and to point visitors to my email when it doesn't know.
@@ -90,7 +93,7 @@ To change what it knows beyond the site's content (CV details, how the site is b
 - `npm run build` — production build
 - `npm run start` — run the production build locally
 - `npm run lint` — lint the project
-- `node --test tests/` — API tests, run against a running server (`TEST_BASE_URL`, default `http://localhost:3000`)
+- `node --test tests/` — the robot's state-machine tests, plus API tests run against a running server (`TEST_BASE_URL`, default `http://localhost:3000`)
 
 ## Deployment
 
