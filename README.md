@@ -27,7 +27,7 @@ Everything on the site is content-driven from a handful of typed data files unde
 | **Projects** | Cards for [AgroSync](https://joyntoghosh.vercel.app/case-studies/agrosync), [Club Connect](https://joyntoghosh.vercel.app/case-studies/club-connect), and [FixItNow](https://joyntoghosh.vercel.app/case-studies/fixitnow) |
 | **Case Studies** | A deep engineering write-up for each project — architecture, system design, security, and real technical challenges, not just a screenshot |
 | **Contact** | A working contact form (via Resend) plus direct email/social links |
-| **AI assistant** | A chat button on every page — visitors ask about me, my skills, and my projects in English or Bangla, and Gemini (free tier) or Claude answers from the site's own content |
+| **AI assistant** | A little robot on every page — visitors ask about me, my skills, and my projects in English or Bangla, and Gemini (free tier) or Claude answers from the site's own content |
 
 ## Tech Stack
 
@@ -72,12 +72,14 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## AI Assistant
 
-The chat button in the bottom-right corner opens an assistant that answers visitors' questions about me — background, skills, education, experience, projects, case studies, and how to get in touch.
+The robot in the bottom-right corner opens an assistant that answers visitors' questions about me — background, skills, education, experience, projects, case studies, and how to get in touch.
+
+- **A robot with personality** — drawn in SVG and animated with Framer Motion (`src/components/chat/robot.tsx`): its eyes and head follow the cursor anywhere on the page, it blinks, and it thinks while an answer loads, talks while it streams, and looks sad on an error. On desktop it now and then strolls along the bottom of the screen and back, and hovering makes it smile, wave and say hello. It stays put on phones and for visitors who prefer reduced motion.
 
 - **Bilingual** — it replies in the language of the question: English, Bangla, or Bangla typed in English letters (answered in Bangla script). The English / বাংলা switch in the chat header changes the interface and the default for messages with no clear language.
 - **Grounded in the site** — each request carries everything the site shows (profile, skills, education, experience, projects, case studies, socials), read from the same content as the pages, plus extra CV details from `src/data/chatbot.ts`. It's told to answer only from that and to point visitors to my email when it doesn't know.
 - **Page-aware** — on a project or case study page, "this project" means the one being viewed.
-- **Either AI, free or paid** — set `GEMINI_API_KEY` (free from [Google AI Studio](https://aistudio.google.com/apikey), no card; Google may use free-tier conversations to improve its products) or `ANTHROPIC_API_KEY` (paid; Claude Opus 5.5). If both are set, Claude is used. With neither, the chat button stays hidden.
+- **Either AI, free or paid** — set `GEMINI_API_KEY` (free from [Google AI Studio](https://aistudio.google.com/apikey), no card; Google may use free-tier conversations to improve its products) or `ANTHROPIC_API_KEY` (paid; Claude Opus 5.5). If both are set, Claude is used. With neither, the robot stays hidden.
 - **Cost controls** — the instructions and content sit in a cached prompt prefix; each visitor gets 20 messages per 10 minutes, questions are capped at 1,500 characters, and answers at 4,096 tokens. With Claude, also set a monthly spend limit in the [Anthropic Console](https://console.anthropic.com/).
 
 To change what it knows beyond the site's content (CV details, how the site is built, the Bangla spelling of my name, or pronouns for English answers), edit `src/data/chatbot.ts`.
