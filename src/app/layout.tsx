@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { ChatWidget } from "@/components/chat/chat-widget";
+import { configuredChatProvider } from "@/lib/chat/provider";
 import { getProfile, getSocials } from "@/lib/prisma";
 import "./globals.css";
 
@@ -64,6 +65,8 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const [profile, socials] = await Promise.all([getProfile(), getSocials()]);
+  // Without an API key the assistant can't answer, so its button stays hidden.
+  const chatEnabled = configuredChatProvider() !== null;
 
   return (
     <html
@@ -78,9 +81,9 @@ export default async function RootLayout({
             <Navbar profile={profile} />
             {children}
             <Footer profile={profile} socials={socials} />
-            <ChatWidget name={profile.name} avatarUrl={profile.avatarUrl} email={profile.email} />
+            {chatEnabled && <ChatWidget name={profile.name} avatarUrl={profile.avatarUrl} email={profile.email} />}
             {/* Raised so toasts stack above the assistant's launcher instead of covering it. */}
-            <Toaster offset={{ bottom: 88 }} mobileOffset={{ bottom: 80 }} />
+            <Toaster {...(chatEnabled && { offset: { bottom: 88 }, mobileOffset: { bottom: 80 } })} />
           </TooltipProvider>
         </ThemeProvider>
       </body>

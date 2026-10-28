@@ -47,4 +47,4 @@ Extra-curricular: participant in the DIU Unlock the Algorithm Programming Contes
 Spoken languages: Bangla (native), English (fluent).`;
 
 /** How this site is built, for visitors who ask. */
-export const siteFacts = `This portfolio website is Joynto's own, built with Next.js 16 (App Router), React 19 and TypeScript, styled with Tailwind CSS v4, shadcn/ui and Framer Motion, with light and dark themes. Its content lives in a Neon Postgres database through Prisma and is edited from a private admin dashboard; the contact form sends email through Resend; it is deployed on Vercel. This AI assistant runs on Claude, by Anthropic, and answers from the same content the site shows.`;
+export const siteFacts = `This portfolio website is Joynto's own, built with Next.js 16 (App Router), React 19 and TypeScript, styled with Tailwind CSS v4, shadcn/ui and Framer Motion, with light and dark themes. Its content lives in a Neon Postgres database through Prisma and is edited from a private admin dashboard; the contact form sends email through Resend; it is deployed on Vercel. This AI assistant answers from the same content the site shows.`;
