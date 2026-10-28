@@ -1,39 +1,19 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import { chatRequestSchema, type ChatErrorCode, type ChatStreamEvent } from "@/lib/chat-schema";
+import { claude } from "@/lib/chat/claude";
+import { gemini } from "@/lib/chat/gemini";
 import { getPortfolioKnowledge, type PortfolioKnowledge } from "@/lib/chat/knowledge";
 import { buildSystemPrompt, buildVisitorContext } from "@/lib/chat/prompt";
+import { configuredChatProvider } from "@/lib/chat/provider";
 import { checkRateLimit, visitorKey } from "@/lib/chat/rate-limit";
 
 /** Seconds Vercel lets this function run; a long, detailed answer finishes well inside it. */
 export const maxDuration = 60;
 
-const MODEL = process.env.CHAT_MODEL || "claude-opus-5-5";
-/** Room for the model's brief thinking plus a detailed answer — Bangla takes more tokens per word. */
-const MAX_TOKENS = 4096;
-
-let anthropic: Anthropic | undefined;
+const providers = { claude, gemini };
 
 function errorResponse(error: ChatErrorCode, status: number, headers?: HeadersInit) {
   return NextResponse.json({ error }, { status, headers });
-}
-
-/** What the visitor is told when a call to Claude fails; logs the failures the owner needs to see. */
-function classify(error: unknown): { code: ChatErrorCode; status: number } {
-  if (error instanceof Anthropic.AuthenticationError || error instanceof Anthropic.PermissionDeniedError) {
-    console.error("Chat: Anthropic rejected the API key:", error.message);
-    return { code: "unavailable", status: 503 };
-  }
-  if (
-    error instanceof Anthropic.RateLimitError ||
-    error instanceof Anthropic.InternalServerError ||
-    error instanceof Anthropic.APIConnectionError
-  ) {
-    console.warn("Chat: Anthropic is busy or unreachable:", error.message);
-    return { code: "busy", status: 503 };
-  }
-  console.error("Chat: request to Anthropic failed:", error);
-  return { code: "unknown", status: 500 };
 }
 
 export async function POST(request: Request) {
@@ -50,10 +30,12 @@ export async function POST(request: Request) {
   const limit = checkRateLimit(visitorKey(request));
   if (!limit.ok) return errorResponse("rate_limited", 429, { "Retry-After": String(limit.retryAfter) });
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    console.error("Chat: ANTHROPIC_API_KEY is not set, so the assistant is offline.");
+  const providerName = configuredChatProvider();
+  if (!providerName) {
+    console.error("Chat: neither ANTHROPIC_API_KEY nor GEMINI_API_KEY is set, so the assistant is offline.");
     return errorResponse("unavailable", 503);
   }
+  const provider = providers[providerName];
 
   let knowledge: PortfolioKnowledge;
   try {
@@ -63,32 +45,23 @@ export async function POST(request: Request) {
     return errorResponse("unavailable", 503);
   }
 
+  // Stops the model when the visitor leaves or presses Stop, so no tokens go to waste.
+  const stop = new AbortController();
   const { messages, locale, page } = parsed.data;
-  anthropic ??= new Anthropic();
-  const stream = anthropic.beta.messages.stream(
-    {
-      model: MODEL,
-      max_tokens: MAX_TOKENS,
-      // Thinking is always on for this model; low effort keeps it short so answers start fast.
-      output_config: { effort: "low" },
-      // If a safety classifier declines a question, the API retries it on the fallback model
-      // Anthropic recommends for that case, within the same stream.
-      betas: ["server-side-fallback-2026-07-01"],
-      fallbacks: "default",
-      system: [{ type: "text", text: buildSystemPrompt(knowledge), cache_control: { type: "ephemeral" } }],
-      messages: [...messages, { role: "system", content: buildVisitorContext({ knowledge, locale, page }) }],
-    },
-    { signal: request.signal }
-  );
+  const answer = provider.answer({
+    system: buildSystemPrompt(knowledge, provider.label),
+    context: buildVisitorContext({ knowledge, locale, page }),
+    messages,
+    signal: AbortSignal.any([request.signal, stop.signal]),
+  });
 
-  // Wait for the first event, so a failure before any text (bad key, overload) gets a real status code.
-  const events = stream[Symbol.asyncIterator]();
-  let first: Awaited<ReturnType<typeof events.next>>;
+  // Wait for the first text, so a failure before any (bad key, overload) gets a real status code.
+  let first: IteratorResult<string>;
   try {
-    first = await events.next();
+    first = await answer.next();
   } catch (error) {
     if (request.signal.aborted) return new Response(null, { status: 499 });
-    const { code, status } = classify(error);
+    const { code, status } = provider.classify(error);
     return errorResponse(code, status);
   }
 
@@ -101,32 +74,22 @@ export async function POST(request: Request) {
         if (!cancelled) controller.enqueue(encoder.encode(`${JSON.stringify(event)}\n`));
       };
       try {
-        for (let result = first; !result.done; result = await events.next()) {
-          const event = result.value;
-          if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
-            send({ type: "text", text: event.delta.text });
-          }
+        let result = first;
+        while (!result.done) {
+          send({ type: "text", text: result.value });
+          result = await answer.next();
         }
-        const message = await stream.finalMessage();
-        const { usage } = message;
-        console.info(
-          `Chat: ${message.model} stop=${message.stop_reason} in=${usage.input_tokens} cache_read=${usage.cache_read_input_tokens ?? 0} cache_write=${usage.cache_creation_input_tokens ?? 0} out=${usage.output_tokens}`
-        );
         // A refusal can arrive after some text has streamed; the client replaces it with a notice.
-        send(
-          message.stop_reason === "refusal"
-            ? { type: "refusal" }
-            : { type: "done", truncated: message.stop_reason === "max_tokens" }
-        );
+        send(result.value === "refused" ? { type: "refusal" } : { type: "done", truncated: result.value === "truncated" });
       } catch (error) {
-        if (!request.signal.aborted && !cancelled) send({ type: "error", error: classify(error).code });
+        if (!request.signal.aborted && !cancelled) send({ type: "error", error: provider.classify(error).code });
       } finally {
         if (!cancelled) controller.close();
       }
     },
     cancel() {
       cancelled = true;
-      stream.abort();
+      stop.abort();
     },
   });
 
