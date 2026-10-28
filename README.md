@@ -27,6 +27,7 @@ Everything on the site is content-driven from a handful of typed data files unde
 | **Projects** | Cards for [AgroSync](https://joyntoghosh.vercel.app/case-studies/agrosync), [Club Connect](https://joyntoghosh.vercel.app/case-studies/club-connect), and [FixItNow](https://joyntoghosh.vercel.app/case-studies/fixitnow) |
 | **Case Studies** | A deep engineering write-up for each project — architecture, system design, security, and real technical challenges, not just a screenshot |
 | **Contact** | A working contact form (via Resend) plus direct email/social links |
+| **AI assistant** | A chat button on every page — visitors ask about me, my skills, and my projects in English or Bangla, and Claude answers from the site's own content |
 
 ## Tech Stack
 
@@ -35,6 +36,8 @@ Everything on the site is content-driven from a handful of typed data files unde
 **Styling & UI** — Tailwind CSS v4 · shadcn/ui (Radix primitives) · Framer Motion · `next-themes` for light/dark mode
 
 **Forms & Email** — React Hook Form–free native forms · Zod validation · Resend for the contact form
+
+**AI** — Claude via the Anthropic TypeScript SDK, streamed to the browser
 
 **Other** — `lucide-react` + `react-icons` for iconography · `sonner` for toasts
 
@@ -46,8 +49,10 @@ src/
 │   ├── page.tsx                    Home page — composes all sections
 │   ├── projects/[slug]/            Lightweight project detail pages
 │   ├── case-studies/[slug]/        Deep-dive case study pages
-│   └── api/contact/                Contact form API route (Resend)
+│   ├── api/contact/                Contact form API route (Resend)
+│   └── api/chat/                   AI assistant API route (Claude, streamed)
 ├── components/
+│   ├── chat/                       AI assistant chat widget
 │   ├── sections/                   Hero, About, Skills, Education, Experience, Projects, Contact
 │   └── ui/                         shadcn/ui primitives (Button, Badge, etc.)
 └── data/                           Typed content — profile, skills, education, experience, projects, case studies, socials
@@ -59,11 +64,22 @@ Content changes (a new project, an updated bio line, a new case study) mean edit
 
 ```bash
 npm install
-cp .env.local.example .env.local   # add RESEND_API_KEY + CONTACT_TO_EMAIL to enable the contact form
+cp .env.local.example .env.local   # add RESEND_API_KEY + CONTACT_TO_EMAIL for the contact form, ANTHROPIC_API_KEY for the AI assistant
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+## AI Assistant
+
+The chat button in the bottom-right corner opens an assistant that answers visitors' questions about me — background, skills, education, experience, projects, case studies, and how to get in touch.
+
+- **Bilingual** — it replies in the language of the question: English, Bangla, or Bangla typed in English letters (answered in Bangla script). The English / বাংলা switch in the chat header changes the interface and the default for messages with no clear language.
+- **Grounded in the site** — each request carries everything the site shows (profile, skills, education, experience, projects, case studies, socials), read from the same content as the pages, plus extra CV details from `src/data/chatbot.ts`. It's told to answer only from that and to point visitors to my email when it doesn't know.
+- **Page-aware** — on a project or case study page, "this project" means the one being viewed.
+- **Cost controls** — the instructions and content sit in a cached prompt prefix; each visitor gets 20 messages per 10 minutes, questions are capped at 1,500 characters, and answers at 4,096 tokens. Also set a monthly spend limit in the [Anthropic Console](https://console.anthropic.com/).
+
+To change what it knows beyond the site's content (CV details, how the site is built, the Bangla spelling of my name, or pronouns for English answers), edit `src/data/chatbot.ts`.
 
 ## Scripts
 
@@ -71,10 +87,11 @@ Open [http://localhost:3000](http://localhost:3000).
 - `npm run build` — production build
 - `npm run start` — run the production build locally
 - `npm run lint` — lint the project
+- `node --test tests/` — API tests, run against a running server (`TEST_BASE_URL`, default `http://localhost:3000`)
 
 ## Deployment
 
-Hosted on [Vercel](https://joyntoghosh.vercel.app/). Environment variables (`RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `NEXT_PUBLIC_SITE_URL`) are set in the Vercel project settings.
+Hosted on [Vercel](https://joyntoghosh.vercel.app/). Environment variables (`RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `NEXT_PUBLIC_SITE_URL`, `ANTHROPIC_API_KEY`, and optionally `CHAT_MODEL`) are set in the Vercel project settings.
 
 ## Contact
 

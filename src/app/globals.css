@@ -10,6 +10,8 @@
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
   --font-heading: var(--font-heading);
+  /* Geist for Latin text, Noto Sans Bengali for Bangla — the AI assistant speaks both. */
+  --font-bilingual: var(--font-sans), var(--font-bengali);
   --color-warm-white: var(--warm-white);
   --color-ivory: var(--ivory);
   --color-espresso: var(--espresso);
@@ -154,15 +156,4 @@
   html {
     @apply font-sans;
   }
-}
-
-/* Nova, the AI guide (src/components/guide/ai-guide.tsx) */
-@keyframes guide-wave {
-  0%, 100% { transform: scaleY(0.3); }
-  50% { transform: scaleY(1); }
-}
-
-@keyframes guide-scan {
-  from { transform: translateY(-100%); }
-  to { transform: translateY(200%); }
 }

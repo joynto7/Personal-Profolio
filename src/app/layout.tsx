@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Fraunces } from "next/font/google";
+import { Geist, Geist_Mono, Fraunces, Noto_Sans_Bengali } from "next/font/google";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
-import { AIGuide } from "@/components/guide/ai-guide";
+import { ChatWidget } from "@/components/chat/chat-widget";
 import { getProfile, getSocials } from "@/lib/prisma";
 import "./globals.css";
 
@@ -26,6 +26,13 @@ const fraunces = Fraunces({
   variable: "--font-heading",
   subsets: ["latin"],
   axes: ["opsz", "SOFT", "WONK"],
+});
+
+// Bangla text in the AI assistant. Not preloaded: the file only downloads once Bangla is on screen.
+const notoSansBengali = Noto_Sans_Bengali({
+  variable: "--font-bengali",
+  subsets: ["bengali"],
+  preload: false,
 });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -63,7 +70,7 @@ export default async function RootLayout({
       lang="en"
       data-scroll-behavior="smooth"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full scroll-smooth antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} ${notoSansBengali.variable} h-full scroll-smooth antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
@@ -71,8 +78,9 @@ export default async function RootLayout({
             <Navbar profile={profile} />
             {children}
             <Footer profile={profile} socials={socials} />
-            <AIGuide />
-            <Toaster />
+            <ChatWidget name={profile.name} avatarUrl={profile.avatarUrl} email={profile.email} />
+            {/* Raised so toasts stack above the assistant's launcher instead of covering it. */}
+            <Toaster offset={{ bottom: 88 }} mobileOffset={{ bottom: 80 }} />
           </TooltipProvider>
         </ThemeProvider>
       </body>
