@@ -83,7 +83,7 @@ export default async function RootLayout({
             <Footer profile={profile} socials={socials} />
             {chatEnabled && <ChatWidget name={profile.name} email={profile.email} />}
             {/* Raised so toasts stack above the assistant's launcher instead of covering it. */}
-            <Toaster {...(chatEnabled && { offset: { bottom: 124 }, mobileOffset: { bottom: 96 } })} />
+            <Toaster {...(chatEnabled && { offset: { bottom: 156 }, mobileOffset: { bottom: 108 } })} />
           </TooltipProvider>
         </ThemeProvider>
       </body>

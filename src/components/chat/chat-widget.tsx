@@ -53,8 +53,8 @@ const MESSAGES_KEY = "portfolio-chat:messages";
 const TEASER_KEY = "portfolio-chat:teaser-seen";
 /** Matches Tailwind's `sm` breakpoint: below it the panel fills the screen. */
 const MOBILE_QUERY = "(max-width: 639px)";
-/** The robot's head, relative to the desktop panel (right-6 bottom-32, over the launcher), so the panel grows out of it. */
-const ROBOT_HEAD_ORIGIN = "calc(100% - 36px) calc(100% + 43px)";
+/** The robot's head, relative to the desktop panel (right-6 bottom-40, over the launcher), so the panel grows out of it. */
+const ROBOT_HEAD_ORIGIN = "calc(100% - 50px) calc(100% + 53px)";
 /** How long the visitor counts as typing after a keystroke, for the robot's listening face. */
 const TYPING_MS = 1500;
 
@@ -563,7 +563,7 @@ export function ChatWidget({ name, email }: { name: string; email: string }) {
             aria-labelledby={titleId}
             lang={locale}
             {...panelMotion}
-            className="fixed inset-0 z-[70] flex origin-bottom-right flex-col overflow-hidden bg-background text-foreground sm:inset-auto sm:right-6 sm:bottom-32 sm:h-[min(40rem,calc(100dvh-10rem))] sm:w-[25rem] sm:rounded-2xl sm:border sm:border-border sm:shadow-2xl"
+            className="fixed inset-0 z-[70] flex origin-bottom-right flex-col overflow-hidden bg-background text-foreground sm:inset-auto sm:right-6 sm:bottom-40 sm:h-[min(40rem,calc(100dvh-12rem))] sm:w-[25rem] sm:rounded-2xl sm:border sm:border-border sm:shadow-2xl"
           >
             <header className="flex items-center gap-3 bg-espresso px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 text-warm-white sm:pt-3">
               <span className="relative flex size-11 shrink-0 items-center justify-center rounded-full bg-warm-white/10 ring-1 ring-caramel/50">
