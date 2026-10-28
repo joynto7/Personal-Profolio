@@ -128,26 +128,28 @@ export function Robot({
   const rightEye = useMotionValue(1);
   const glow = useMotionValue(face.glow);
   const cheeks = useMotionValue(face.cheeks);
+  const sway = useMotionValue(0);
 
   // The 2.5D layers: the further forward a part sits, the further it slides as the head turns.
-  const shellX = useTransform(turn, (t) => t);
-  const shellScaleX = useTransform(turn, (t) => 1 - Math.abs(t) * 0.03);
-  const earsX = useTransform(turn, (t) => t * -2.2);
-  const visorX = useTransform(turn, (t) => t * 2.5);
-  const visorY = useTransform(nod, (n) => n * 1.5);
-  const faceX = useTransform(turn, (t) => t * 3.5);
-  const faceY = useTransform(nod, (n) => n * 2);
-  const shineX = useTransform(turn, (t) => t * -1.5);
-  const sheenX = useTransform(turn, (t) => t * -4);
-  const bodyX = useTransform(turn, (t) => t * 0.8);
+  const shellX = useTransform(turn, (t) => t * 1.4);
+  const shellScaleX = useTransform(turn, (t) => 1 - Math.abs(t) * 0.04);
+  const earsX = useTransform(turn, (t) => t * -3);
+  const visorX = useTransform(turn, (t) => t * 3.2);
+  const visorY = useTransform(nod, (n) => n * 2);
+  const faceX = useTransform(turn, (t) => t * 4.6);
+  const faceY = useTransform(nod, (n) => n * 2.6);
+  const shineX = useTransform(turn, (t) => t * -2);
+  const sheenX = useTransform(turn, (t) => t * -6);
+  const bodyX = useTransform(turn, (t) => t * 1.2);
   const glintX = useTransform(lookX, (x) => x * -0.15);
   const headRotate = useTransform([tilt, shake], ([roll, jolt]: number[]) => roll + jolt);
   const figureTiltX = useTransform([tiltX, leanIn], ([pointer, gestureLean]: number[]) => pointer + gestureLean);
-  // The antenna trails the head's turns, then wobbles back: follow-through.
+  // The antenna sways on its own and trails the head's turns, then wobbles back: follow-through.
   const antennaSwing = useSpring(
     useTransform(useVelocity(turn), (velocity) => clamp(-velocity * 5, -14, 14)),
     { stiffness: 140, damping: 7 }
   );
+  const antennaRotate = useTransform([antennaSwing, sway], ([trail, idle]: number[]) => trail + idle);
   const eyesScaleY = useTransform([eyeOpen, blink], ([open, lid]: number[]) => open * lid);
   const leftSlant = useTransform(eyeSlant, (slant) => -slant);
   const mouthOpen = useTransform(mouth, [0, 1], [0.35, 1]);
@@ -156,7 +158,9 @@ export function Robot({
   const shadowScale = useTransform([float, hop], ([lift, jump]: number[]) => 1 + lift * 0.035 + jump * 0.03);
   const shadowOpacity = useTransform([float, hop], ([lift, jump]: number[]) => 1 + lift * 0.08 + jump * 0.06);
   const shadowX = useTransform(lean, (degrees) => degrees * 0.8);
-  const aura = useTransform(glow, [0.5, 1], [0, 0.55]);
+  // A soft glow is always there, and swells as the robot engages.
+  const aura = useTransform(glow, [0.3, 1], [0.22, 0.7]);
+  const eyeHalo = useTransform(glow, [0, 1], [0.3, 1]);
 
   useEffect(() => {
     restraintRef.current = restraint;
@@ -200,14 +204,15 @@ export function Robot({
       lookX.set(x);
       lookY.set(y);
       if (still) return;
-      // The head and body only fully turn for what's close by, or for an element the visitor is on.
-      const engaged = (target ? 1 : 0.35 + 0.65 * clamp((600 - distance) / 420, 0, 1)) * restraintRef.current;
+      // It turns well toward the pointer from anywhere on the page, and all the way when it's close
+      // or on an element the visitor is on.
+      const engaged = (target ? 1 : 0.75 + 0.25 * clamp((600 - distance) / 420, 0, 1)) * restraintRef.current;
       turn.set(clamp(dx / 260, -1, 1) * engaged);
-      nod.set(clamp(dy / 320, -1, 1) * 0.8 * engaged);
-      tilt.set(clamp(dx / 50, -6, 6) * engaged);
-      lean.set(clamp(dx / 320, -1, 1) * 2 * engaged);
-      tiltY.set(clamp(dx / 320, -1, 1) * 5 * engaged);
-      tiltX.set(clamp(-dy / 320, -1, 1) * 4 * engaged);
+      nod.set(clamp(dy / 320, -1, 1) * 0.9 * engaged);
+      tilt.set(clamp(dx / 45, -8, 8) * engaged);
+      lean.set(clamp(dx / 320, -1, 1) * 3 * engaged);
+      tiltY.set(clamp(dx / 320, -1, 1) * 9 * engaged);
+      tiltX.set(clamp(-dy / 320, -1, 1) * 7 * engaged);
     };
     const aim = () => {
       frame.read(measure);
@@ -216,17 +221,24 @@ export function Robot({
 
     aim();
     const unsubscribe = subscribeRobotLook(aim);
-    // While the visitor rests, glance around now and then — and back at them sometimes.
+    // While the visitor rests, look around every few seconds with a real turn of the head — and
+    // back at them sometimes.
     const glances = window.setInterval(() => {
       const pointer = getRobotPointer();
       if (getRobotGaze() || (pointer && performance.now() - pointer.at < IDLE_GAZE_MS)) return;
-      const atVisitor = Math.random() < 0.35;
-      const x = atVisitor ? 0 : (Math.random() * 2 - 1) * EYE_RANGE.x;
-      lookX.set(x);
-      lookY.set(atVisitor ? 0 : (Math.random() * 2 - 1) * EYE_RANGE.y * 0.6);
+      const atVisitor = Math.random() < 0.3;
+      const side = atVisitor ? 0 : (Math.random() < 0.5 ? -1 : 1) * (0.45 + Math.random() * 0.45);
+      const up = atVisitor ? 0 : (Math.random() * 2 - 1) * 0.5;
+      lookX.set(side * EYE_RANGE.x);
+      lookY.set(up * EYE_RANGE.y);
       if (still) return;
-      turn.set((x / EYE_RANGE.x) * 0.3 * restraintRef.current);
-      for (const value of [nod, tilt, lean, tiltX, tiltY]) value.set(0);
+      const r = restraintRef.current;
+      turn.set(side * r);
+      nod.set(up * 0.6 * r);
+      tilt.set(side * 5 * r);
+      lean.set(side * 2 * r);
+      tiltY.set(side * 7 * r);
+      tiltX.set(-up * 4 * r);
     }, 2600);
 
     return () => {
@@ -260,9 +272,16 @@ export function Robot({
   // A gentle float, on the HTML wrapper so it costs no SVG repaints.
   useEffect(() => {
     if (still || variant === "head") return;
-    const controls = animate(float, [0, walking ? -2 : -2.5, 0], loop(walking ? 0.3 : 2.4));
+    const controls = animate(float, [0, walking ? -2.5 : -3.5, 0], loop(walking ? 0.3 : 2.4));
     return () => controls.stop();
   }, [still, variant, walking, float]);
+
+  // The antenna's slow idle sway.
+  useEffect(() => {
+    if (still) return;
+    const controls = animate(sway, [-4, 4, -4], loop(3.4));
+    return () => controls.stop();
+  }, [still, sway]);
 
   // Each streamed piece of an answer, or word read aloud, moves the mouth.
   useEffect(() => {
@@ -331,8 +350,15 @@ export function Robot({
     glow: `${id}-glow`,
     chest: `${id}-chest`,
     shade: `${id}-shade`,
+    form: `${id}-form`,
+    rim: `${id}-rim`,
+    caramel: `${id}-caramel`,
   };
   const shell = { fill: `url(#${ids.shell})`, className: "stroke-espresso" };
+  const caramel = { fill: `url(#${ids.caramel})`, className: "stroke-espresso" };
+  // Overlays that round a flat shape off: shade toward its far edges, light along its near ones.
+  const form = { fill: `url(#${ids.form})`, stroke: "none" };
+  const rim = { fill: "none", stroke: `url(#${ids.rim})`, strokeWidth: 1.4 };
   const mouthCurve = MOUTH_CURVES[face.mouth];
   const loops = !still;
 
@@ -349,11 +375,26 @@ export function Robot({
       strokeLinecap="round"
     >
       <defs>
-        {/* Soft light from the top left, falling off toward the bottom right */}
+        {/* Light from the top left, falling off toward the bottom right */}
         <linearGradient id={ids.shell} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#fffaf4" />
-          <stop offset="0.5" style={{ stopColor: "var(--ivory)" }} />
-          <stop offset="1" stopColor="#e2d5c7" />
+          <stop offset="0" stopColor="#ffffff" />
+          <stop offset="0.45" style={{ stopColor: "var(--ivory)" }} />
+          <stop offset="1" stopColor="#cdb9a5" />
+        </linearGradient>
+        {/* Rounds a shape off: its far edges turn away from the light */}
+        <radialGradient id={ids.form} cx="0.38" cy="0.3" r="0.9">
+          <stop offset="0.55" style={{ stopColor: "var(--espresso)" }} stopOpacity="0" />
+          <stop offset="1" style={{ stopColor: "var(--espresso)" }} stopOpacity="0.3" />
+        </radialGradient>
+        {/* A rim of light along the edges facing it */}
+        <linearGradient id={ids.rim} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#fff" stopOpacity="0.95" />
+          <stop offset="0.4" stopColor="#fff" stopOpacity="0" />
+        </linearGradient>
+        <linearGradient id={ids.caramel} x1="0" y1="0" x2="0.6" y2="1">
+          <stop offset="0" stopColor="#e2ad7c" />
+          <stop offset="0.5" style={{ stopColor: "var(--caramel)" }} />
+          <stop offset="1" stopColor="#9e6638" />
         </linearGradient>
         <radialGradient id={ids.shine}>
           <stop offset="0" stopColor="#fff" stopOpacity="0.95" />
@@ -396,7 +437,7 @@ export function Robot({
               transition={loop(walking ? 0.6 : 2.4)}
             >
               <rect x={37} y={86} width={9} height={18} rx={4.5} {...shell} />
-              <rect x={33.5} y={100} width={14} height={7} rx={3.5} className="fill-caramel stroke-espresso" />
+              <rect x={33.5} y={100} width={14} height={7} rx={3.5} {...caramel} />
             </motion.g>
             <motion.g
               style={at(58.5, 86)}
@@ -404,7 +445,7 @@ export function Robot({
               transition={loop(walking ? 0.6 : 2.4)}
             >
               <rect x={54} y={86} width={9} height={18} rx={4.5} {...shell} />
-              <rect x={52.5} y={100} width={14} height={7} rx={3.5} className="fill-caramel stroke-espresso" />
+              <rect x={52.5} y={100} width={14} height={7} rx={3.5} {...caramel} />
             </motion.g>
             {/* Arms, hanging from the shoulders */}
             <motion.g style={at(24, 66)} {...(loops ? armMotion("left", face.arms, walking) : {})}>
@@ -416,7 +457,9 @@ export function Robot({
             {/* Body, with a highlight, the head's shadow and a glowing chest light */}
             <motion.g style={{ x: bodyX }}>
               <rect x={29} y={62} width={42} height={30} rx={13} {...shell} />
-              <ellipse cx={38} cy={68.5} rx={6} ry={2.2} fill={`url(#${ids.shine})`} opacity={0.7} transform="rotate(-20 38 68.5)" />
+              <rect x={29} y={62} width={42} height={30} rx={13} {...form} />
+              <rect x={30.8} y={63.8} width={38.4} height={26.4} rx={11.2} {...rim} />
+              <ellipse cx={38} cy={68.5} rx={7.5} ry={2.4} fill={`url(#${ids.shine})`} opacity={0.9} transform="rotate(-20 38 68.5)" />
               <ellipse cx={50} cy={64.5} rx={17} ry={3.4} fill={`url(#${ids.shade})`} />
               <motion.circle
                 cx={50}
@@ -424,7 +467,7 @@ export function Robot({
                 r={8}
                 fill={`url(#${ids.glow})`}
                 initial={false}
-                animate={{ opacity: face.chest === "dim" ? 0 : face.chest === "flash" ? 0.9 : 0.45 }}
+                animate={{ opacity: face.chest === "dim" ? 0 : face.chest === "flash" ? 1 : 0.65 }}
               />
               <motion.circle
                 cx={50}
@@ -432,6 +475,7 @@ export function Robot({
                 r={4.5}
                 fill={`url(#${ids.chest})`}
                 style={at(50, 77)}
+                initial={{ opacity: 1, scale: 1 }}
                 {...(face.chest === "dim" || !loops
                   ? { animate: { opacity: face.chest === "dim" ? 0.35 : 1, scale: 1 }, transition: { duration: 0.3 } }
                   : face.chest === "flash"
@@ -448,9 +492,9 @@ export function Robot({
 
         {/* Head, turning and tilting from the neck */}
         <motion.g style={{ ...at(50, 59), rotate: headRotate, y: headDip }}>
-          {/* Antenna, trailing the head's turns */}
+          {/* Antenna, swaying and trailing the head's turns */}
           <motion.g style={{ x: shellX }}>
-            <motion.g style={{ ...at(50, 17), rotate: antennaSwing }}>
+            <motion.g style={{ ...at(50, 17), rotate: antennaRotate }}>
               <line x1={50} y1={17} x2={50} y2={8} className="stroke-espresso" />
               <motion.circle
                 cx={50}
@@ -465,7 +509,8 @@ export function Robot({
                 cx={50}
                 cy={6}
                 r={4.5}
-                className="fill-caramel"
+                fill={`url(#${ids.caramel})`}
+                initial={{ opacity: 1 }}
                 {...(!loops || face.antenna === "bright"
                   ? { animate: { opacity: 1 }, transition: { duration: 0.2 } }
                   : face.antenna === "flash"
@@ -491,8 +536,8 @@ export function Robot({
 
           {/* Ears sit behind the face, so they slide the other way as it turns */}
           <motion.g style={{ x: earsX }}>
-            <rect x={11} y={29} width={8} height={16} rx={4} className="fill-caramel stroke-espresso" />
-            <rect x={81} y={29} width={8} height={16} rx={4} className="fill-caramel stroke-espresso" />
+            <rect x={11} y={29} width={8} height={16} rx={4} {...caramel} />
+            <rect x={81} y={29} width={8} height={16} rx={4} {...caramel} />
             {/* Lights that show it's listening */}
             <motion.g
               className={GLOW}
@@ -508,9 +553,12 @@ export function Robot({
           {/* Shell, narrowing slightly as it turns; its highlights stay where the light is */}
           <motion.g style={{ ...at(50, 37), x: shellX, scaleX: shellScaleX }}>
             <rect x={16} y={15} width={68} height={44} rx={20} {...shell} />
+            <rect x={16} y={15} width={68} height={44} rx={20} {...form} />
+            <rect x={17.8} y={16.8} width={64.4} height={40.4} rx={18.2} {...rim} />
             <motion.g style={{ x: shineX }} fill={`url(#${ids.shine})`}>
-              <ellipse cx={34} cy={18.6} rx={7} ry={2} opacity={0.9} />
-              <ellipse cx={19.6} cy={37} rx={1.3} ry={6} opacity={0.6} />
+              <ellipse cx={34} cy={18.6} rx={9} ry={2.4} />
+              <ellipse cx={19.6} cy={37} rx={1.4} ry={7} opacity={0.75} />
+              <circle cx={26.5} cy={19.2} r={1.1} />
             </motion.g>
           </motion.g>
 
@@ -520,9 +568,11 @@ export function Robot({
             <rect x={23} y={22} width={54} height={30} rx={13} fill={`url(#${ids.visor})`} />
             <g clipPath={`url(#${ids.visorClip})`}>
               <motion.g style={{ x: sheenX }} fill="#fff">
-                <path d="M41 20 L49 20 L37 54 L29 54 Z" opacity={0.07} />
-                <path d="M51 20 L54 20 L42 54 L39 54 Z" opacity={0.05} />
+                <path d="M41 20 L49 20 L37 54 L29 54 Z" opacity={0.12} />
+                <path d="M51 20 L54 20 L42 54 L39 54 Z" opacity={0.08} />
               </motion.g>
+              {/* Light caught along the top of the curved glass */}
+              <path d="M31 25.6 Q50 21.8 69 25.6" fill="none" stroke="#fff" strokeOpacity={0.22} strokeWidth={2} />
               {/* A slow scan line while it thinks */}
               <motion.rect
                 x={23}
@@ -548,12 +598,12 @@ export function Robot({
             {/* Eyes: they follow the pointer, settle where the face says (up while thinking), and squint when happy */}
             <motion.g style={{ x: lookX, y: lookY }}>
               <motion.g initial={false} animate={face.gaze ?? { x: 0, y: 0 }}>
-                <motion.g style={{ opacity: glow }} fill={`url(#${ids.glow})`}>
-                  <ellipse cx={40} cy={36.5} rx={9} ry={10} />
-                  <ellipse cx={60} cy={36.5} rx={9} ry={10} />
+                <motion.g style={{ opacity: eyeHalo }} fill={`url(#${ids.glow})`}>
+                  <ellipse cx={40} cy={36.5} rx={10.5} ry={11.5} />
+                  <ellipse cx={60} cy={36.5} rx={10.5} ry={11.5} />
                 </motion.g>
                 <motion.g
-                  style={{ ...at(50, 36.5), scale: eyeSize, scaleY: eyesScaleY, filter: "drop-shadow(0 0 2px rgba(255, 190, 120, 0.9))" }}
+                  style={{ ...at(50, 36.5), scale: eyeSize, scaleY: eyesScaleY, filter: "drop-shadow(0 0 3px rgba(255, 190, 120, 0.95))" }}
                   initial={false}
                   animate={{ opacity: face.eyes === "happy" ? 0 : 1 }}
                   transition={{ duration: 0.12 }}
@@ -571,7 +621,7 @@ export function Robot({
                   className={GLOW_STROKE}
                   strokeWidth={3}
                   fill="none"
-                  style={{ filter: "drop-shadow(0 0 2px rgba(255, 190, 120, 0.9))" }}
+                  style={{ filter: "drop-shadow(0 0 3px rgba(255, 190, 120, 0.95))" }}
                   initial={false}
                   animate={{ opacity: face.eyes === "happy" ? 1 : 0 }}
                   transition={{ duration: 0.12 }}
@@ -635,7 +685,7 @@ export function Robot({
       {/* A contact shadow that shrinks as the robot rises, and an aura when it's engaged */}
       <motion.div
         aria-hidden
-        className="pointer-events-none absolute top-[91.5%] left-[27%] h-[6.5%] w-[46%] rounded-[50%] bg-[radial-gradient(closest-side,rgb(74_47_39/0.3),transparent)] dark:bg-[radial-gradient(closest-side,rgb(0_0_0/0.6),transparent)]"
+        className="pointer-events-none absolute top-[91.5%] left-[27%] h-[6.5%] w-[46%] rounded-[50%] bg-[radial-gradient(closest-side,rgb(74_47_39/0.42),transparent)] dark:bg-[radial-gradient(closest-side,rgb(0_0_0/0.75),transparent)]"
         style={{ scaleX: shadowScale, opacity: shadowOpacity, x: shadowX }}
       />
       <motion.div

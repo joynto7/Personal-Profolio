@@ -53,8 +53,8 @@ const MESSAGES_KEY = "portfolio-chat:messages";
 const TEASER_KEY = "portfolio-chat:teaser-seen";
 /** Matches Tailwind's `sm` breakpoint: below it the panel fills the screen. */
 const MOBILE_QUERY = "(max-width: 639px)";
-/** The robot's head, relative to the desktop panel (right-6 bottom-32, over the launcher), so the panel grows out of it. */
-const ROBOT_HEAD_ORIGIN = "calc(100% - 36px) calc(100% + 43px)";
+/** The robot's head, relative to the desktop panel (right-6 bottom-40, over the launcher), so the panel grows out of it. */
+const ROBOT_HEAD_ORIGIN = "calc(100% - 50px) calc(100% + 53px)";
 /** How long the visitor counts as typing after a keystroke, for the robot's listening face. */
 const TYPING_MS = 1500;
 
@@ -67,15 +67,16 @@ function subscribeMobile(listener: () => void) {
 const isMobile = () => window.matchMedia(MOBILE_QUERY).matches;
 
 function copyFor(locale: ChatLocale, firstName: string, email: string) {
+  const assistant = assistantProfile.name;
   if (locale === "bn") {
     const name = assistantProfile.firstNameBn;
     const possessive = assistantProfile.firstNamePossessiveBn;
     return {
-      launcher: "আমার AI সহকারীকে জিজ্ঞেস করুন",
-      open: `${possessive} AI সহকারীর সাথে চ্যাট খুলুন`,
-      title: `${possessive} AI সহকারী`,
-      greeting: `হ্যালো! আমি ${possessive} AI সহকারী। ওনার দক্ষতা, প্রজেক্ট, অভিজ্ঞতা বা যোগাযোগের উপায় — যা জানতে চান, বাংলা বা English-এ জিজ্ঞেস করুন।`,
-      teaser: `হ্যালো! ${name} সম্পর্কে যা জানতে চান, আমাকে জিজ্ঞেস করুন — বাংলা বা English-এ।`,
+      launcher: `আমার AI সহকারী ${assistant}-কে জিজ্ঞেস করুন`,
+      open: `${possessive} AI সহকারী ${assistant}-এর সাথে চ্যাট খুলুন`,
+      title: assistant,
+      greeting: `হ্যালো! আমি ${assistant}, ${possessive} AI সহকারী। ওনার দক্ষতা, প্রজেক্ট, অভিজ্ঞতা বা যোগাযোগের উপায় — যা জানতে চান, বাংলা বা English-এ জিজ্ঞেস করুন।`,
+      teaser: `হ্যালো! আমি ${assistant} — ${name} সম্পর্কে যা জানতে চান, আমাকে জিজ্ঞেস করুন, বাংলা বা English-এ।`,
       suggestions: [
         `${name} সম্পর্কে সংক্ষেপে বলুন`,
         "ওনার উল্লেখযোগ্য প্রজেক্টগুলো কী কী?",
@@ -83,7 +84,7 @@ function copyFor(locale: ChatLocale, firstName: string, email: string) {
         "ওনার সাথে কীভাবে যোগাযোগ করা যায়?",
       ],
       thisProject: "এই প্রজেক্টটা কীভাবে বানানো হয়েছে?",
-      placeholder: `${name} সম্পর্কে জিজ্ঞেস করুন…`,
+      placeholder: `${assistant}-কে ${name} সম্পর্কে জিজ্ঞেস করুন…`,
       inputLabel: "আপনার প্রশ্ন",
       send: "মেসেজ পাঠান",
       stop: "উত্তর থামান",
@@ -104,19 +105,19 @@ function copyFor(locale: ChatLocale, firstName: string, email: string) {
       noVoice: "এই ডিভাইসে বাংলা ভয়েস নেই, তাই উত্তরটি পড়ে শোনানো যায়নি।",
       errors: {
         rate_limited: "খুব দ্রুত মেসেজ পাঠানো হচ্ছে — একটু অপেক্ষা করে আবার চেষ্টা করুন।",
-        busy: "সহকারী এই মুহূর্তে ব্যস্ত — কিছুক্ষণ পর আবার চেষ্টা করুন।",
-        unavailable: `সহকারী এখন অফলাইনে আছে। ${email} ঠিকানায় সরাসরি যোগাযোগ করতে পারেন।`,
+        busy: `${assistant} এই মুহূর্তে ব্যস্ত — কিছুক্ষণ পর আবার চেষ্টা করুন।`,
+        unavailable: `${assistant} এখন অফলাইনে আছে। ${email} ঠিকানায় সরাসরি যোগাযোগ করতে পারেন।`,
         invalid: "মেসেজটি পাঠানো যায়নি — একটু ছোট করে আবার চেষ্টা করুন।",
         unknown: "কিছু একটা সমস্যা হয়েছে — আবার চেষ্টা করুন।",
       } satisfies Record<ChatErrorCode, string>,
     };
   }
   return {
-    launcher: "Ask my AI assistant",
-    open: `Open a chat with ${firstName}'s AI assistant`,
-    title: `${firstName}'s AI assistant`,
-    greeting: `Hi! I'm ${firstName}'s AI assistant. Ask me anything about ${firstName}'s skills, projects and experience, or how to get in touch — in English or বাংলা.`,
-    teaser: `Hi there! Ask me anything about ${firstName} — in English or বাংলা.`,
+    launcher: `Ask ${assistant}, my AI assistant`,
+    open: `Open a chat with ${assistant}, ${firstName}'s AI assistant`,
+    title: assistant,
+    greeting: `Hi! I'm ${assistant}, ${firstName}'s AI assistant. Ask me anything about ${firstName}'s skills, projects and experience, or how to get in touch — in English or বাংলা.`,
+    teaser: `Hi there! I'm ${assistant} — ask me anything about ${firstName}, in English or বাংলা.`,
     suggestions: [
       `Give me a quick intro to ${firstName}`,
       `What are ${firstName}'s best projects?`,
@@ -124,7 +125,7 @@ function copyFor(locale: ChatLocale, firstName: string, email: string) {
       `How can I get in touch with ${firstName}?`,
     ],
     thisProject: "How was this project built?",
-    placeholder: `Ask about ${firstName}…`,
+    placeholder: `Ask ${assistant} about ${firstName}…`,
     inputLabel: "Your question",
     send: "Send message",
     stop: "Stop the answer",
@@ -145,8 +146,8 @@ function copyFor(locale: ChatLocale, firstName: string, email: string) {
     noVoice: "This device has no Bangla voice, so the answer wasn't read aloud.",
     errors: {
       rate_limited: "You're sending messages quickly — please wait a moment and try again.",
-      busy: "The assistant is busy right now — please try again in a moment.",
-      unavailable: `The assistant is offline right now. You can reach ${firstName} directly at ${email}.`,
+      busy: `${assistant} is busy right now — please try again in a moment.`,
+      unavailable: `${assistant} is offline right now. You can reach ${firstName} directly at ${email}.`,
       invalid: "That message couldn't be sent — try making it a little shorter.",
       unknown: "Something went wrong — please try again.",
     } satisfies Record<ChatErrorCode, string>,
@@ -563,7 +564,7 @@ export function ChatWidget({ name, email }: { name: string; email: string }) {
             aria-labelledby={titleId}
             lang={locale}
             {...panelMotion}
-            className="fixed inset-0 z-[70] flex origin-bottom-right flex-col overflow-hidden bg-background text-foreground sm:inset-auto sm:right-6 sm:bottom-32 sm:h-[min(40rem,calc(100dvh-10rem))] sm:w-[25rem] sm:rounded-2xl sm:border sm:border-border sm:shadow-2xl"
+            className="fixed inset-0 z-[70] flex origin-bottom-right flex-col overflow-hidden bg-background text-foreground sm:inset-auto sm:right-6 sm:bottom-40 sm:h-[min(40rem,calc(100dvh-12rem))] sm:w-[25rem] sm:rounded-2xl sm:border sm:border-border sm:shadow-2xl"
           >
             <header className="flex items-center gap-3 bg-espresso px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 text-warm-white sm:pt-3">
               <span className="relative flex size-11 shrink-0 items-center justify-center rounded-full bg-warm-white/10 ring-1 ring-caramel/50">

@@ -265,7 +265,7 @@ export function RobotLauncher({
         aria-controls={open ? panelId : undefined}
         animate={{ rotate: walking ? heading * 5 : 0 }}
         whileTap={{ scale: 0.92 }}
-        className="relative block h-[72px] w-[60px] rounded-2xl outline-none focus-visible:ring-3 focus-visible:ring-ring/60 sm:h-[88px] sm:w-[73px]"
+        className="relative block h-[84px] w-[70px] rounded-2xl outline-none focus-visible:ring-3 focus-visible:ring-ring/60 sm:h-[120px] sm:w-[100px]"
       >
         <Robot walking={walking} className="size-full" />
         {open && (

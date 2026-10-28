@@ -72,9 +72,9 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## AI Assistant
 
-The robot in the bottom-right corner opens an assistant that answers visitors' questions about me — background, skills, education, experience, projects, case studies, and how to get in touch.
+The robot in the bottom-right corner opens **Nebula 2.0**, an assistant that answers visitors' questions about me — background, skills, education, experience, projects, case studies, and how to get in touch.
 
-- **A robot with personality** — drawn in SVG and animated with Framer Motion (`src/components/chat/robot.tsx`), with depth built from layers: as it turns, its face plate slides further than its shell, its ears slide the other way and its highlights stay put, while the whole figure tilts a few degrees in 3D. Its eyes lead and its head and body follow the cursor. As the cursor comes near it turns curious and its "Ask my AI assistant" invitation peeks out; on hover it waves.
+- **A robot with personality** — drawn in SVG and animated with Framer Motion (`src/components/chat/robot.tsx`), with depth built from layers: as it turns, its face plate slides further than its shell, its ears slide the other way and its highlights stay put, while the whole figure tilts a few degrees in 3D. Its eyes lead and its head and body follow the cursor from anywhere on the page, and while the visitor rests it looks around every few seconds. As the cursor comes near it turns curious and its "Ask my AI assistant" invitation peeks out; on hover it waves.
 - **Aware of the page** — it looks at buttons and links as they're hovered or focused (anything marked `data-robot="…"`): it nods at the resume, waves at contact links, flashes its antenna at GitHub. It only watches, so every click still goes straight through. Its states live in a small, tested state machine (`src/lib/robot/brain.ts`).
 - **Expressive** — in the chat it listens while you type, thinks while an answer loads and speaks while it streams. A failed request gets a brief, restrained error face, and the contact form's real success gets a happy one. On desktop, after 20 seconds of no activity it takes a short stroll, walking back the moment the visitor returns. It stays docked on phones, and for visitors who prefer reduced motion it keeps still apart from its eyes and face.
 - **Sound and voice, both opt-in** — the speaker button in the chat header turns on short synthesized sound effects (Web Audio, no audio files) with a volume slider, and can read answers aloud with the browser's own speech, a sentence at a time. Both start off and are remembered. Bangla is read aloud only where the device has a Bangla voice.
@@ -85,7 +85,7 @@ The robot in the bottom-right corner opens an assistant that answers visitors' q
 - **Either AI, free or paid** — set `GEMINI_API_KEY` (free from [Google AI Studio](https://aistudio.google.com/apikey), no card; Google may use free-tier conversations to improve its products) or `ANTHROPIC_API_KEY` (paid; Claude Opus 5.5). If both are set, Claude is used. With neither, the robot stays hidden.
 - **Cost controls** — the instructions and content sit in a cached prompt prefix; each visitor gets 20 messages per 10 minutes, questions are capped at 1,500 characters, and answers at 4,096 tokens. With Claude, also set a monthly spend limit in the [Anthropic Console](https://console.anthropic.com/).
 
-To change what it knows beyond the site's content (CV details, how the site is built, the Bangla spelling of my name, or pronouns for English answers), edit `src/data/chatbot.ts`.
+To change its name or what it knows beyond the site's content (CV details, how the site is built, the Bangla spelling of my name, or pronouns for English answers), edit `src/data/chatbot.ts`.
 
 ## Scripts
 
