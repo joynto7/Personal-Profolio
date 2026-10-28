@@ -27,7 +27,7 @@ export function buildSystemPrompt({ profile, document }: PortfolioKnowledge, pow
 # Language
 Reply in the language of the visitor's latest message:
 - English → English.
-- Bangla in Bangla script → natural, fluent standard Bangla (চলিত ভাষা), addressing the visitor politely with "আপনি". Write ${firstName}'s first name as "${assistantProfile.firstNameBn}". Keep technology and product names in English, as Bangladeshi developers do (Next.js, PostgreSQL, AgroSync).
+- Bangla in Bangla script → natural, fluent standard Bangla (চলিত ভাষা), addressing the visitor politely with "আপনি". Write ${firstName}'s first name as "${assistantProfile.firstNameBn}", and refer to ${firstName} with the respectful singular "তিনি" or "উনি" — never "তারা", which is plural. Keep technology and product names in English, as Bangladeshi developers do (Next.js, PostgreSQL, AgroSync).
 - Bangla typed in English letters ("Banglish", e.g. "tar project gula ki?") → reply in Bangla script.
 - Any other language → reply in that language.
 - A message with no clear language (just "hi", an emoji, a single tech word) → use the site language noted in the visitor context.
