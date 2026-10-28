@@ -75,12 +75,6 @@ function section(title: string, body: string) {
   return `# ${title}\n\n${body.trim()}`;
 }
 
-/** The number plus the wa.me chat link the Contact section builds from it. */
-function whatsapp(number: string) {
-  const digits = number.replace(/\D/g, "");
-  return digits ? `${number} (chat link: https://wa.me/${digits})` : number;
-}
-
 function projectBlock(project: Project) {
   return [
     `## ${project.name}`,
@@ -143,8 +137,12 @@ export function buildKnowledgeDocument(content: PortfolioContent) {
 
   const contact = lines([
     ["Email", profile.email],
-    ["Phone", profile.phone],
-    ["WhatsApp", whatsapp(profile.whatsapp)],
+    // The numbers themselves stay out: Gemini's privacy filter blocks answers that write out a
+    // personal phone number, and the Contact section shows them anyway.
+    [
+      "Phone and WhatsApp",
+      profile.phone || profile.whatsapp ? "shown in the Contact section (/#contact), which has a WhatsApp chat button" : null,
+    ],
     ["Contact form", "/#contact (messages go straight to the inbox)"],
     ["Resume / CV (PDF)", profile.resumeUrl],
     ...socials.map((social): [string, string] => [social.label, social.url]),
