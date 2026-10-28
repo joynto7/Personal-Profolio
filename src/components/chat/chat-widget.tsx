@@ -10,10 +10,9 @@ import {
   type KeyboardEvent,
   type ReactNode,
 } from "react";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowUp, RotateCcw, Sparkles, Square, X } from "lucide-react";
+import { ArrowUp, RotateCcw, Square, X } from "lucide-react";
 import { assistantProfile } from "@/data/chatbot";
 import {
   CHAT_ERROR_CODES,
@@ -24,6 +23,8 @@ import {
   type ChatStreamEvent,
 } from "@/lib/chat-schema";
 import { ChatMarkdown } from "@/components/chat/chat-markdown";
+import { Robot, type RobotMood } from "@/components/chat/robot";
+import { RobotLauncher } from "@/components/chat/robot-launcher";
 import { cn } from "@/lib/utils";
 
 /**
@@ -54,7 +55,6 @@ function copyFor(locale: ChatLocale, firstName: string, email: string) {
     const possessive = assistantProfile.firstNamePossessiveBn;
     return {
       launcher: "আমার AI সহকারীকে জিজ্ঞেস করুন",
-      launcherShort: "AI সহকারী",
       open: `${possessive} AI সহকারীর সাথে চ্যাট খুলুন`,
       title: `${possessive} AI সহকারী`,
       greeting: `হ্যালো! আমি ${possessive} AI সহকারী। ওনার দক্ষতা, প্রজেক্ট, অভিজ্ঞতা বা যোগাযোগের উপায় — যা জানতে চান, বাংলা বা English-এ জিজ্ঞেস করুন।`,
@@ -90,7 +90,6 @@ function copyFor(locale: ChatLocale, firstName: string, email: string) {
   }
   return {
     launcher: "Ask my AI assistant",
-    launcherShort: "Ask AI",
     open: `Open a chat with ${firstName}'s AI assistant`,
     title: `${firstName}'s AI assistant`,
     greeting: `Hi! I'm ${firstName}'s AI assistant. Ask me anything about ${firstName}'s skills, projects and experience, or how to get in touch — in English or বাংলা.`,
@@ -215,7 +214,7 @@ const hasBangla = (text: string) => /[\u0980-\u09FF]/.test(text);
 const isErrorCode = (value: unknown): value is ChatErrorCode =>
   CHAT_ERROR_CODES.includes(value as ChatErrorCode);
 
-export function ChatWidget({ name, avatarUrl, email }: { name: string; avatarUrl: string; email: string }) {
+export function ChatWidget({ name, email }: { name: string; email: string }) {
   const firstName = name.split(/\s+/)[0];
   const locale = useSyncExternalStore(subscribeLocale, readLocale, () => "en" as const);
   const copy = copyFor(locale, firstName, email);
@@ -434,6 +433,15 @@ export function ChatWidget({ name, avatarUrl, email }: { name: string; avatarUrl
   const onProjectPage = /^\/(case-studies|projects)\/[^/]+/.test(pathname);
   const suggestions = onProjectPage ? [copy.thisProject, ...copy.suggestions.slice(0, 3)] : copy.suggestions;
   const nearLimit = input.length > CHAT_LIMITS.userMessageChars * 0.8;
+  // The robot thinks while waiting for an answer, talks while it streams, and looks sad on an error.
+  const last = messages.at(-1);
+  const mood: RobotMood = pending
+    ? last?.content
+      ? "talking"
+      : "thinking"
+    : last?.status === "error"
+      ? "sad"
+      : "idle";
 
   return (
     <div className="font-bilingual">
@@ -448,17 +456,11 @@ export function ChatWidget({ name, avatarUrl, email }: { name: string; avatarUrl
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 16, scale: 0.98 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="fixed inset-0 z-[70] flex origin-bottom-right flex-col overflow-hidden bg-background text-foreground sm:inset-auto sm:right-6 sm:bottom-24 sm:h-[min(40rem,calc(100dvh-8rem))] sm:w-[25rem] sm:rounded-2xl sm:border sm:border-border sm:shadow-2xl"
+            className="fixed inset-0 z-[70] flex origin-bottom-right flex-col overflow-hidden bg-background text-foreground sm:inset-auto sm:right-6 sm:bottom-32 sm:h-[min(40rem,calc(100dvh-10rem))] sm:w-[25rem] sm:rounded-2xl sm:border sm:border-border sm:shadow-2xl"
           >
             <header className="flex items-center gap-3 bg-espresso px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 text-warm-white sm:pt-3">
-              <span className="relative shrink-0">
-                <Image
-                  src={avatarUrl}
-                  alt=""
-                  width={40}
-                  height={40}
-                  className="size-10 rounded-full object-cover ring-2 ring-caramel/60"
-                />
+              <span className="relative flex size-11 shrink-0 items-center justify-center rounded-full bg-warm-white/10 ring-1 ring-caramel/50">
+                <Robot variant="head" mood={mood} className="w-9" />
                 <span aria-hidden className="absolute -right-0.5 -bottom-0.5 size-3 rounded-full bg-emerald-400 ring-2 ring-espresso" />
               </span>
               <div className="min-w-0 flex-1">
@@ -641,60 +643,19 @@ export function ChatWidget({ name, avatarUrl, email }: { name: string; avatarUrl
         )}
       </AnimatePresence>
 
-      <div className="fixed right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-[60] flex flex-col items-end gap-3 sm:right-6 sm:bottom-6">
-        <AnimatePresence>
-          {teaser && !open && (
-            <motion.div
-              lang={locale}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 8 }}
-              transition={{ duration: 0.25 }}
-              className="relative w-64 rounded-2xl rounded-br-md border border-border bg-card p-3 pr-9 text-sm text-card-foreground shadow-lg"
-            >
-              <button type="button" onClick={openChat} className="text-left leading-snug">
-                {copy.teaser}
-              </button>
-              <button
-                type="button"
-                onClick={() => setTeaser(false)}
-                aria-label={copy.dismiss}
-                className="absolute top-2 right-2 flex size-6 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-              >
-                <X className="size-3.5" />
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <button
-          ref={launcherRef}
-          type="button"
-          onClick={open ? closeChat : openChat}
-          aria-expanded={open}
-          aria-controls={open ? panelId : undefined}
-          aria-label={open ? copy.close : copy.open}
-          className={cn(
-            "flex items-center rounded-full bg-primary text-primary-foreground shadow-lg ring-1 ring-caramel/40 transition-all hover:-translate-y-0.5 hover:shadow-xl focus-visible:ring-3 focus-visible:ring-ring/60 focus-visible:outline-none",
-            open ? "size-12 justify-center" : "gap-2.5 py-1.5 pr-4 pl-1.5"
-          )}
-        >
-          {open ? (
-            <X className="size-5" />
-          ) : (
-            <>
-              <span className="relative">
-                <Image src={avatarUrl} alt="" width={36} height={36} className="size-9 rounded-full object-cover" />
-                <Sparkles aria-hidden className="absolute -top-1 -right-1 size-4 rounded-full bg-caramel p-0.5 text-espresso" />
-              </span>
-              <span lang={locale} className="text-sm font-medium">
-                <span className="sm:hidden">{copy.launcherShort}</span>
-                <span className="hidden sm:inline">{copy.launcher}</span>
-              </span>
-            </>
-          )}
-        </button>
-      </div>
+      <RobotLauncher
+        open={open}
+        mood={mood}
+        label={open ? copy.close : copy.open}
+        panelId={panelId}
+        hint={copy.launcher}
+        teaser={teaser ? copy.teaser : null}
+        dismissLabel={copy.dismiss}
+        lang={locale}
+        onToggle={open ? closeChat : openChat}
+        onDismissTeaser={() => setTeaser(false)}
+        buttonRef={launcherRef}
+      />
     </div>
   );
 }
