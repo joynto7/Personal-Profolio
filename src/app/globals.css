@@ -10,6 +10,8 @@
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
   --font-heading: var(--font-heading);
+  /* Geist for Latin text, Noto Sans Bengali for Bangla — the AI assistant speaks both. */
+  --font-bilingual: var(--font-sans), var(--font-bengali);
   --color-warm-white: var(--warm-white);
   --color-ivory: var(--ivory);
   --color-espresso: var(--espresso);
