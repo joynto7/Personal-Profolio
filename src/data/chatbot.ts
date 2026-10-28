@@ -5,6 +5,8 @@
  * This file only holds what the database has no field for.
  */
 export const assistantProfile = {
+  /** The assistant's own name, shown in the chat and used when it introduces itself, in both languages. */
+  name: "Nebula 2.0",
   /** First name in Bangla script, used in Bangla replies and the Bangla UI. */
   firstNameBn: "জয়ন্ত",
   /** The same name in the possessive ("Joynto's"), as Bangla attaches it to the word. */
