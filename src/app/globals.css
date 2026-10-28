@@ -157,3 +157,22 @@
     @apply font-sans;
   }
 }
+
+/*
+ * The AI assistant's robot looks at page elements marked with data-robot. The buttons among
+ * them also lift a touch under the pointer, so the page answers first and the robot second.
+ * In the components layer, so a button's own utilities (its press, its focus ring) still win.
+ * The shadows use plain colours: with color-mix(), Tailwind adds an @supports fallback that
+ * Turbopack's CSS build silently drops this whole layer over.
+ */
+@layer components {
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    [data-slot="button"][data-robot]:not(:disabled):hover {
+      translate: 0 -2px;
+      box-shadow: 0 10px 20px -12px rgb(74 47 39 / 0.6);
+    }
+    .dark [data-slot="button"][data-robot]:not(:disabled):hover {
+      box-shadow: 0 10px 22px -12px rgb(0 0 0 / 0.75);
+    }
+  }
+}

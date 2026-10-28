@@ -48,6 +48,7 @@ export default async function CaseStudyPage({ params }: Props) {
     <main className="mx-auto max-w-4xl px-6 py-16">
       <Link
         href="/#projects"
+        data-robot="nav"
         className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
       >
         <ArrowLeft className="size-4" />
@@ -83,7 +84,7 @@ export default async function CaseStudyPage({ params }: Props) {
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
         {caseStudy.liveUrl && (
-          <Button asChild>
+          <Button data-robot="live" asChild>
             <a href={caseStudy.liveUrl} target="_blank" rel="noopener noreferrer">
               <ExternalLink className="size-4" />
               Live Demo
@@ -91,7 +92,7 @@ export default async function CaseStudyPage({ params }: Props) {
           </Button>
         )}
         {caseStudy.githubUrl ? (
-          <Button variant="outline" asChild>
+          <Button variant="outline" data-robot="github" asChild>
             <a href={caseStudy.githubUrl} target="_blank" rel="noopener noreferrer">
               <ExternalLink className="size-4" />
               GitHub Repo

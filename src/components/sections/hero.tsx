@@ -50,13 +50,13 @@ export function Hero({ profile, socials }: { profile: Profile; socials: Social[]
         </motion.p>
 
         <motion.div variants={item} className="mt-8 flex flex-wrap items-center justify-center gap-4 md:justify-start">
-          <Button size="lg" asChild>
+          <Button size="lg" data-robot="resume" asChild>
             <a href={profile.resumeUrl} target="_blank" rel="noopener noreferrer">
               <Download className="size-4" />
               View Resume
             </a>
           </Button>
-          <Button size="lg" variant="outline" asChild>
+          <Button size="lg" variant="outline" data-robot="contact" asChild>
             <Link href="/#contact">Get in Touch</Link>
           </Button>
         </motion.div>
@@ -72,6 +72,7 @@ export function Hero({ profile, socials }: { profile: Profile; socials: Social[]
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={social.label}
+                    data-robot={social.iconKey === "social-github" ? "github" : "social"}
                     className="flex size-10 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:border-caramel hover:bg-caramel hover:text-white"
                   >
                     {Icon && <Icon className="size-4" />}

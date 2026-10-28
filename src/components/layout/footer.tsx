@@ -24,6 +24,7 @@ export function Footer({ profile, socials }: { profile: Profile; socials: Social
               <li key={link.href}>
                 <Link
                   href={link.href}
+                  data-robot="nav"
                   className="text-sm text-warm-white/80 transition-colors hover:text-caramel"
                 >
                   {link.label}
@@ -45,6 +46,7 @@ export function Footer({ profile, socials }: { profile: Profile; socials: Social
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.label}
+                  data-robot={social.iconKey === "social-github" ? "github" : "social"}
                   className="flex size-9 items-center justify-center rounded-full bg-warm-white/10 text-warm-white transition-colors hover:bg-caramel hover:text-espresso"
                 >
                   {Icon && <Icon className="size-4" />}

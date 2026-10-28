@@ -49,6 +49,7 @@ export function Navbar({ profile }: { profile: Profile }) {
             <li key={link.href}>
               <Link
                 href={link.href}
+                data-robot="nav"
                 className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
                 {link.label}
@@ -76,6 +77,7 @@ export function Navbar({ profile }: { profile: Profile }) {
                       <SheetClose asChild>
                         <Link
                           href={link.href}
+                          data-robot="nav"
                           className="block rounded-md px-2 py-3 text-base font-medium text-foreground transition-colors hover:bg-muted"
                         >
                           {link.label}

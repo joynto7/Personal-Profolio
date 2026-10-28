@@ -40,6 +40,7 @@ export function CaseStudies({ caseStudies }: { caseStudies: CaseStudy[] }) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
+              data-robot="card"
               className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 hover:shadow-lg sm:flex-row"
             >
               <div className="relative aspect-video shrink-0 overflow-hidden sm:aspect-square sm:w-64">
@@ -70,6 +71,7 @@ export function CaseStudies({ caseStudies }: { caseStudies: CaseStudy[] }) {
 
                 <Link
                   href={`/case-studies/${caseStudy.slug}`}
+                  data-robot="details"
                   className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-foreground transition-colors hover:text-caramel"
                 >
                   Read Case Study
