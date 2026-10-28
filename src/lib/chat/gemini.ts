@@ -1,10 +1,17 @@
-import { ApiError, FinishReason, GoogleGenAI, ThinkingLevel, type GenerateContentResponseUsageMetadata } from "@google/genai";
+import {
+  ApiError,
+  FinishReason,
+  GoogleGenAI,
+  ThinkingLevel,
+  type GenerateContentResponse,
+  type GenerateContentResponseUsageMetadata,
+} from "@google/genai";
 import { MAX_ANSWER_TOKENS, type ChatProvider } from "@/lib/chat/provider";
 
 /**
  * Free-tier quotas are set per model (some keys get none for the newest one), so when a model
- * is out of quota or overloaded, the next one answers. GEMINI_MODEL, if set, goes first.
- * Gemini 3 models only: older ones take a thinking budget instead of the level set below.
+ * is out of quota, overloaded, stalled or declines, the next one answers. GEMINI_MODEL, if
+ * set, goes first. Gemini 3 models only: older ones take a thinking budget instead of a level.
  */
 const MODELS = [
   ...new Set(
@@ -15,6 +22,11 @@ const MODELS = [
 ];
 /** Unavailable now, but another model may not be: quota used up (429), missing (404) or overloaded (5xx). */
 const TRY_NEXT = (status: number) => status === 404 || status === 429 || status >= 500;
+/**
+ * A model that sends nothing for this long is dropped for the next one. Answers normally start
+ * within a few seconds, and the four tries together stay inside the function's 60-second limit.
+ */
+const FIRST_CHUNK_TIMEOUT_MS = 10_000;
 
 /** Finish reasons where Gemini stopped on policy grounds rather than finishing the answer. */
 const DECLINED = new Set<FinishReason>([
@@ -24,6 +36,13 @@ const DECLINED = new Set<FinishReason>([
   FinishReason.PROHIBITED_CONTENT,
   FinishReason.SPII,
 ]);
+
+class GeminiStalled extends Error {
+  constructor(model: string) {
+    super(`${model} sent nothing for ${FIRST_CHUNK_TIMEOUT_MS / 1000}s`);
+    this.name = "GeminiStalled";
+  }
+}
 
 let client: GoogleGenAI | undefined;
 /** The model that answered last, tried first next time so a dead one doesn't cost every request a round trip. */
@@ -39,13 +58,19 @@ export const gemini: ChatProvider = {
       parts: [{ text: message.content }],
     }));
 
-    let chunks: Awaited<ReturnType<typeof ai.models.generateContentStream>> | undefined;
-    let model = MODELS[preferred];
-    for (let attempt = 0; !chunks; attempt++) {
-      const index = (preferred + attempt) % MODELS.length;
-      model = MODELS[index];
+    const start = preferred;
+    for (let attempt = 0; attempt < MODELS.length; attempt++) {
+      const index = (start + attempt) % MODELS.length;
+      const model = MODELS[index];
+      const last = attempt === MODELS.length - 1;
+
+      // Each try can be dropped on its own if it stalls, without ending the visitor's request.
+      const stall = new AbortController();
+      const timer = setTimeout(() => stall.abort(), FIRST_CHUNK_TIMEOUT_MS);
+      let chunks: AsyncIterator<GenerateContentResponse>;
+      let first: IteratorResult<GenerateContentResponse>;
       try {
-        chunks = await ai.models.generateContentStream({
+        const stream = await ai.models.generateContentStream({
           model,
           contents,
           config: {
@@ -55,33 +80,53 @@ export const gemini: ChatProvider = {
             maxOutputTokens: MAX_ANSWER_TOKENS,
             // Flash-Lite models don't take a thinking level; the others think briefly.
             thinkingConfig: model.includes("lite") ? undefined : { thinkingLevel: ThinkingLevel.LOW },
-            abortSignal: signal,
+            abortSignal: AbortSignal.any([signal, stall.signal]),
           },
         });
-        preferred = index;
+        chunks = stream[Symbol.asyncIterator]();
+        first = await chunks.next();
       } catch (error) {
-        const last = attempt === MODELS.length - 1;
-        if (last || !(error instanceof ApiError) || !TRY_NEXT(error.status)) throw error;
-        console.warn(`Chat: ${model} unavailable (${error.status}), trying the next model:`, error.message);
+        if (signal.aborted) throw error;
+        const reason = stall.signal.aborted ? new GeminiStalled(model) : error;
+        const retryable = reason instanceof GeminiStalled || (reason instanceof ApiError && TRY_NEXT(reason.status));
+        if (last || !retryable) throw reason;
+        console.warn(`Chat: ${model} unavailable, trying the next model:`, reason instanceof Error ? reason.message : reason);
+        continue;
+      } finally {
+        clearTimeout(timer);
       }
-    }
+      preferred = index;
 
-    let finishReason: FinishReason | undefined;
-    let blocked = false;
-    let usage: GenerateContentResponseUsageMetadata | undefined;
-    for await (const chunk of chunks) {
-      if (chunk.promptFeedback?.blockReason) blocked = true;
-      finishReason = chunk.candidates?.[0]?.finishReason ?? finishReason;
-      usage = chunk.usageMetadata ?? usage;
-      const text = chunk.text; // excludes thought parts
-      if (text) yield text;
-    }
+      let finishReason: FinishReason | undefined;
+      let blocked = false;
+      let wroteText = false;
+      let usage: GenerateContentResponseUsageMetadata | undefined;
+      for (let step = first; !step.done; step = await chunks.next()) {
+        const chunk = step.value;
+        if (chunk.promptFeedback?.blockReason) blocked = true;
+        finishReason = chunk.candidates?.[0]?.finishReason ?? finishReason;
+        usage = chunk.usageMetadata ?? usage;
+        const text = chunk.text; // excludes thought parts
+        if (text) {
+          wroteText = true;
+          yield text;
+        }
+      }
 
-    console.info(
-      `Chat: ${model} finish=${finishReason} in=${usage?.promptTokenCount ?? 0} cached=${usage?.cachedContentTokenCount ?? 0} thoughts=${usage?.thoughtsTokenCount ?? 0} out=${usage?.candidatesTokenCount ?? 0}`
-    );
-    if (blocked || (finishReason && DECLINED.has(finishReason))) return "refused";
-    return finishReason === FinishReason.MAX_TOKENS ? "truncated" : "done";
+      console.info(
+        `Chat: ${model} finish=${finishReason} blocked=${blocked} in=${usage?.promptTokenCount ?? 0} cached=${usage?.cachedContentTokenCount ?? 0} thoughts=${usage?.thoughtsTokenCount ?? 0} out=${usage?.candidatesTokenCount ?? 0}`
+      );
+      const declined = blocked || (finishReason !== undefined && DECLINED.has(finishReason));
+      // A filter can decline one model's answer and pass another's (contact details trip the
+      // privacy filter now and then), so before anything has been shown, ask the next model.
+      if (declined && !wroteText && !last) {
+        console.warn(`Chat: ${model} declined (${blocked ? "prompt blocked" : finishReason}), trying the next model`);
+        continue;
+      }
+      if (declined) return "refused";
+      return finishReason === FinishReason.MAX_TOKENS ? "truncated" : "done";
+    }
+    return "refused"; // unreachable: the last try always returns or throws
   },
 
   classify(error) {
@@ -91,10 +136,14 @@ export const gemini: ChatProvider = {
         console.error("Chat: Gemini rejected the API key:", error.message);
         return { code: "unavailable", status: 503 };
       }
-      if (error.status === 429 || error.status >= 500) {
-        console.warn("Chat: Gemini is busy or the free-tier quota is used up:", error.message);
+      if (TRY_NEXT(error.status)) {
+        console.warn("Chat: every Gemini model is busy or out of free-tier quota:", error.message);
         return { code: "busy", status: 503 };
       }
+    }
+    if (error instanceof GeminiStalled) {
+      console.warn("Chat: every Gemini model stalled:", error.message);
+      return { code: "busy", status: 503 };
     }
     console.error("Chat: request to Gemini failed:", error);
     return { code: "unknown", status: 500 };

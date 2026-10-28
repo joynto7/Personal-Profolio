@@ -75,7 +75,7 @@ function copyFor(locale: ChatLocale, firstName: string, email: string) {
       dismiss: "বন্ধ করুন",
       language: "ভাষা",
       disclaimer: "AI-এর উত্তরে ভুল থাকতে পারে — জরুরি বিষয়ে সরাসরি ইমেইল করুন।",
-      refusal: `এ বিষয়ে সাহায্য করতে পারছি না, তবে ${possessive} কাজ নিয়ে যেকোনো প্রশ্নের উত্তর দিতে পারি।`,
+      refusal: `এ প্রশ্নের উত্তর দিতে পারছি না — তবে ${email} ঠিকানায় ইমেইল করে বা [যোগাযোগ ফর্ম](/#contact) থেকে সরাসরি যোগাযোগ করতে পারেন।`,
       truncated: "উত্তরটি মাঝপথে থেমে গেছে — বাকিটা জানতে \"আরও বলুন\" লিখুন।",
       stopped: "থামানো হয়েছে।",
       retry: "আবার চেষ্টা করুন",
@@ -110,7 +110,7 @@ function copyFor(locale: ChatLocale, firstName: string, email: string) {
     dismiss: "Dismiss",
     language: "Language",
     disclaimer: `AI answers can be wrong — for anything important, email ${firstName}.`,
-    refusal: `I can't help with that one, but I'm happy to answer anything about ${firstName}'s work.`,
+    refusal: `I can't answer that one — but you can reach ${firstName} directly at ${email} or through the [contact form](/#contact).`,
     truncated: "The answer was cut short — ask me to continue.",
     stopped: "Stopped.",
     retry: "Try again",
@@ -555,7 +555,9 @@ export function ChatWidget({ name, email }: { name: string; email: string }) {
                     {message.status === "streaming" && !message.content ? (
                       <TypingDots />
                     ) : message.status === "refused" ? (
-                      <p className="text-muted-foreground">{copy.refusal}</p>
+                      <div className="text-muted-foreground">
+                        <ChatMarkdown text={copy.refusal} onNavigate={closeIfFullScreen} />
+                      </div>
                     ) : (
                       message.content && (
                         <ChatMarkdown
