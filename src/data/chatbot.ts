@@ -20,29 +20,34 @@ export const assistantProfile = {
  * Facts from the CV (public/CV.pdf) that go beyond what the site shows. Update this
  * alongside the CV — the assistant treats every line here as true.
  */
-export const cvFacts = `Professional summary: Software Engineering undergraduate at Daffodil International University who builds full-stack web platforms end-to-end — from real-time IoT dashboards to marketplace and community platforms. Aiming to grow as a Software Engineer focused on building AI-driven software products, combining full-stack development with practical AI/LLM integration. Comfortable owning a project across design, architecture, and implementation.
+export const cvFacts = `Career objective: Software Engineering undergraduate and freelance full-stack developer who builds web apps with Next.js, TypeScript, Node.js, Express, PostgreSQL and MongoDB. Shipped a paid client CMS and 3 live full-stack platforms with payments, real-time features and AI. Seeking a Software Engineer role to build reliable products.
+
+Based in Mirpur-2, Dhaka, Bangladesh.
 
 Full skill list from the CV:
-- Languages: JavaScript, TypeScript, Python, C++, Go, PHP, SQL
-- Frontend: React.js, Next.js, React Native, Tailwind CSS, Bootstrap
-- Backend: Node.js, Express.js, Flask, REST APIs, Firebase
-- Databases: PostgreSQL, MongoDB, MySQL, vector databases (semantic search)
-- DevOps & tools: Docker, NGINX, Linux, Git, VPS management, CI/CD, Expo, Google Play & App Store deployment
-- AI/ML: LLM APIs, RAG pipelines, Vision APIs, semantic search, multimodal models
+- Languages: JavaScript (ES6+), TypeScript, Python, SQL
+- Frontend: React.js, Next.js, Redux Toolkit, TanStack Query, Zustand, Tailwind CSS, React Native (Expo)
+- Backend: Node.js, Express.js, Flask, REST APIs, Socket.IO, JWT, OAuth 2.0, Firebase
+- Databases & ORMs: PostgreSQL, MongoDB, MySQL, Redis, Prisma, Mongoose, vector databases
+- AI/ML: LLM APIs (Claude), RAG pipelines, semantic search
+- DevOps & tools: Git, GitHub Actions, Docker, NGINX, Linux, VPS, Vercel, Postman, Jest, App Store & Play Store
+- Interpersonal: communication, client handling, teamwork, collaboration, leadership
 
-Education detail: BSc in Software Engineering, Daffodil International University (Daffodil Smart City, Ashulia, Dhaka), January 2024 – December 2027 (expected), CGPA 3.40/4.00.
+Professional experience — Full Stack Developer (freelance) for Nexoria Consultancy, July 2026 – September 2026:
+- Built the client's Next.js 15 + MongoDB website and an admin CMS with 16 content sections, so staff update pages, blogs and courses without a developer
+- Wrote 53 API routes with JWT auth in Edge middleware, bcrypt-hashed logins, rate limiting plus honeypot spam protection, and webhook lead alerts
+- Added a drag-and-drop page builder, a rich-text editor and Cloudinary media uploads
 
-Experience detail (Software Engineer at Penguin, 2024 – present):
-- Built a food delivery web application as part of the team's product lineup
-- Developed "Club Connect", a platform linking club members across university departments
-- Built a marketplace web application for buying and selling musical instruments
+Projects on the CV (all live, with separate client and server code):
+- SurplusBid, a B2B surplus auction marketplace (live: https://surplusbid-frontend.vercel.app; code: https://github.com/joynto7/surplusbid-frontend and https://github.com/joynto7/surplusbid-backend). A timed-auction engine with anti-sniping and Stripe manual-capture deposit holds: losing holds are released and unpaid wins roll over to the next-highest bidder. Concurrent bids are handled with PostgreSQL row locks and Redis rate limiting, lots close via node-cron, and it has 19 Jest + Supertest suites. Claude powers its search, recommendations and chat, each with a built-in fallback engine. Tech: Next.js, TypeScript, Zustand, Node.js, Express, Prisma, PostgreSQL, Redis, Stripe, Jest.
+- Club Connect, a university club management platform (live: https://club-connect-rust.vercel.app; code: https://github.com/joynto7/Club-Connect/tree/main/frontend and https://github.com/joynto7/Club-Connect/tree/main/backend). Three roles (students, club officers, admins) with RSVP waitlists and QR-code check-in, backed by 34 PostgreSQL models; real-time notifications (Socket.IO with the Redis adapter) and venue booking with conflict detection; JWT refresh tokens, Google OAuth and TOTP two-factor auth; event tickets sold through SSLCommerz (bKash, Nagad, Rocket, cards). Tech: Next.js, TypeScript, TanStack Query, Express, Prisma, PostgreSQL, Socket.IO, Redis, SSLCommerz.
+- FixItNow, a home services booking marketplace (live: https://fixitnow-frontend-peach.vercel.app; code: https://github.com/joynto7/fixitnow-frontend and https://github.com/joynto7/fixitnow-backend). Three role-based dashboards (customer, technician, admin) guarded by a shared route proxy; slot-based booking from each technician's availability calendar, with a free-date fallback; Stripe and SSLCommerz checkout, with TanStack Query caching and Zustand state. Tech: Next.js, TypeScript, TanStack Query, Zustand, Zod, Node.js, Express, Prisma, PostgreSQL, Stripe.
 
-Project details from the CV:
-- AgroSync (personal project): streamed real-time sensor data (soil moisture, temperature) from ESP32 devices via MQTT and Socket.IO for live monitoring; enabled remote irrigation control so users can trigger watering cycles from the dashboard; logged historical sensor data in PostgreSQL for trend visualization; built a type-safe full-stack data pipeline with Next.js, Express and Prisma.
-- Club Connect (personal project): a department-wise club directory so students can browse and discover clubs in one place; club profile pages with events, announcements and member information; built with Next.js, Express, TypeScript, Prisma and PostgreSQL.
-- FixItNow (personal project): browse and search technicians by service category and availability; a booking and scheduling flow for home service appointments; fast, cached data fetching with TanStack Query; a responsive, mobile-friendly UI with Next.js, React, TypeScript and Tailwind CSS.
+Education detail: B.Sc. in Software Engineering, Daffodil International University, Dhaka, January 2024 – December 2027 (expected), CGPA 3.40/4.00.
 
-Extra-curricular: participant in the DIU Unlock the Algorithm Programming Contest – Spring '26 (Final), an invite-only, ICPC-regional-style contest organized by Daffodil International University.
+Extra-curricular:
+- 2026 Shenzhen International FinTech Competition (International Track): participant. Built Aegis Wealth AI (https://github.com/joynto7/Aegis-Wealth-AI), an AI wealth-advisory agent with compliance checks and sandboxed execution.
+- DIU Unlock the Algorithm Programming Contest, Spring 2026 Final: participant (invite-only, ICPC-style).
 
 Spoken languages: Bangla (native), English (fluent).`;
 
