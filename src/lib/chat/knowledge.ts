@@ -24,6 +24,7 @@ export type PortfolioContent = {
 
 export type PortfolioKnowledge = {
   profile: Profile;
+  socials: Social[];
   /** Everything the assistant knows, as one document for the system prompt. */
   document: string;
   /** Project and case study paths → what the visitor is looking at, for resolving "this project". */
@@ -261,6 +262,7 @@ export function getPortfolioKnowledge(): Promise<PortfolioKnowledge> {
     .then((content) => {
       const knowledge = {
         profile: content.profile,
+        socials: content.socials,
         document: buildKnowledgeDocument(content),
         pages: buildPageIndex(content),
       };

@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { chatRequestSchema, type ChatErrorCode, type ChatStreamEvent } from "@/lib/chat-schema";
 import { claude } from "@/lib/chat/claude";
+import { contactAnswer, isContactQuestion } from "@/lib/chat/contact-answer";
 import { gemini } from "@/lib/chat/gemini";
 import { getPortfolioKnowledge, type PortfolioKnowledge } from "@/lib/chat/knowledge";
 import { buildSystemPrompt, buildVisitorContext } from "@/lib/chat/prompt";
-import { configuredChatProvider } from "@/lib/chat/provider";
+import { configuredChatProvider, type ChatOutcome } from "@/lib/chat/provider";
 import { checkRateLimit, visitorKey } from "@/lib/chat/rate-limit";
 
 /** Seconds Vercel lets this function run; a long, detailed answer finishes well inside it. */
@@ -56,7 +57,7 @@ export async function POST(request: Request) {
   });
 
   // Wait for the first text, so a failure before any (bad key, overload) gets a real status code.
-  let first: IteratorResult<string>;
+  let first: IteratorResult<string, ChatOutcome>;
   try {
     first = await answer.next();
   } catch (error) {
@@ -74,6 +75,15 @@ export async function POST(request: Request) {
         if (!cancelled) controller.enqueue(encoder.encode(`${JSON.stringify(event)}\n`));
       };
       try {
+        // Gemini's filters sometimes block a plain "how do I reach Joynto?" outright; the profile
+        // answers that one instead of a refusal.
+        const question = messages[messages.length - 1].content;
+        if (first.done && first.value === "refused" && isContactQuestion(question)) {
+          send({ type: "text", text: contactAnswer(knowledge, question) });
+          send({ type: "done", truncated: false });
+          return;
+        }
+
         let result = first;
         while (!result.done) {
           send({ type: "text", text: result.value });
