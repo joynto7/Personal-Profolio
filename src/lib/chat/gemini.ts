@@ -59,6 +59,7 @@ export const gemini: ChatProvider = {
     }));
 
     const start = preferred;
+    let declinesRetried = 0;
     for (let attempt = 0; attempt < MODELS.length; attempt++) {
       const index = (start + attempt) % MODELS.length;
       const model = MODELS[index];
@@ -117,9 +118,10 @@ export const gemini: ChatProvider = {
         `Chat: ${model} finish=${finishReason} blocked=${blocked} in=${usage?.promptTokenCount ?? 0} cached=${usage?.cachedContentTokenCount ?? 0} thoughts=${usage?.thoughtsTokenCount ?? 0} out=${usage?.candidatesTokenCount ?? 0}`
       );
       const declined = blocked || (finishReason !== undefined && DECLINED.has(finishReason));
-      // A filter can decline one model's answer and pass another's (contact details trip the
-      // privacy filter now and then), so before anything has been shown, ask the next model.
-      if (declined && !wroteText && !last) {
+      // A filter can decline one model's answer and pass another's, so before anything has been
+      // shown, one other model gets a turn. A blocked prompt would be blocked again, and more
+      // retries would only burn the free tier's per-minute quota.
+      if (declined && !wroteText && !blocked && !last && declinesRetried++ === 0) {
         console.warn(`Chat: ${model} declined (${blocked ? "prompt blocked" : finishReason}), trying the next model`);
         continue;
       }
